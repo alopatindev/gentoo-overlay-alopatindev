@@ -1,0 +1,24 @@
+diff -ru mcabber-0.10.0.orig/mcabber/xmpp_iq.c mcabber-0.10.0/mcabber/xmpp_iq.c
+--- mcabber-0.10.0.orig/mcabber/xmpp_iq.c	2010-04-11 17:29:31.000000000 +0400
++++ mcabber-0.10.0/mcabber/xmpp_iq.c	2010-11-06 00:10:27.000000000 +0300
+@@ -704,10 +704,16 @@
+                  lm_message_get_from(m));
+   }
+   if (!settings_opt_get_int("iq_version_hide_os")) {
+-    struct utsname osinfo;
+-    uname(&osinfo);
+-    os = g_strdup_printf("%s %s %s", osinfo.sysname, osinfo.release,
+-                         osinfo.machine);
++    FILE *gentoorelease;
++    if ( (gentoorelease = fopen ( "/etc/gentoo-release", "r" ) ) != NULL )
++      os = g_strdup_printf("Gentoo GNU/Linux");
++    else
++    {
++      struct utsname osinfo;
++      uname(&osinfo);
++      os = g_strdup_printf("%s %s %s", osinfo.sysname, osinfo.release,
++                           osinfo.machine);
++    }
+   }
+ 
+   r = lm_message_new_iq_from_query(m, LM_MESSAGE_SUB_TYPE_RESULT);
