@@ -1,7 +1,7 @@
-diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/man/cp.1 /var/tmp/coreutils-8.5.hacked/man/cp.1
---- portage/sys-apps/coreutils-8.5/work/coreutils-8.5/man/cp.1	2010-04-23 20:08:02.000000000 +0400
-+++ /var/tmp/coreutils-8.5.hacked/man/cp.1	2010-12-06 22:42:20.000000000 +0300
-@@ -24,6 +24,9 @@
+diff -ur /var/tmp/portage/sys-apps/coreutils-8.7/work/coreutils-8.7/man/cp.1 coreutils-8.7.hacked/man/cp.1
+--- /var/tmp/portage/sys-apps/coreutils-8.7/work/coreutils-8.7/man/cp.1	2010-11-13 19:23:10.000000000 +0300
++++ coreutils-8.7.hacked/man/cp.1	2010-12-22 16:40:57.000000000 +0300
+@@ -27,6 +27,9 @@
  \fB\-\-backup\fR[=\fICONTROL\fR]
  make a backup of each existing destination file
  .TP
@@ -11,9 +11,9 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/man/cp.1 /var/tmp/cor
  \fB\-b\fR
  like \fB\-\-backup\fR but does not accept an argument
  .TP
-diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.c /var/tmp/coreutils-8.5.hacked/src/copy.c
---- portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.c	2010-04-20 23:52:04.000000000 +0400
-+++ /var/tmp/coreutils-8.5.hacked/src/copy.c	2010-12-06 22:50:20.000000000 +0300
+diff -ur /var/tmp/portage/sys-apps/coreutils-8.7/work/coreutils-8.7/src/copy.c coreutils-8.7.hacked/src/copy.c
+--- /var/tmp/portage/sys-apps/coreutils-8.7/work/coreutils-8.7/src/copy.c	2010-10-28 14:31:17.000000000 +0400
++++ coreutils-8.7.hacked/src/copy.c	2010-12-22 17:03:28.000000000 +0300
 @@ -29,6 +29,10 @@
  # include <priv.h>
  #endif
@@ -41,7 +41,7 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.c /var/tmp/c
  
  #if USE_XATTR
  # include <attr/error_context.h>
-@@ -457,6 +463,230 @@
+@@ -443,6 +449,231 @@
    return lchmod (name, mode);
  }
  
@@ -269,10 +269,11 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.c /var/tmp/c
 +
 +
 +
++
  /* Copy a regular file from SRC_NAME to DST_NAME.
     If the source file contains holes, copies holes and blocks of zeros
     in the source file as holes in the destination file.
-@@ -663,6 +893,16 @@
+@@ -652,6 +883,16 @@
        bool last_write_made_hole = false;
        bool make_holes = false;
  
@@ -289,7 +290,7 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.c /var/tmp/c
        if (S_ISREG (sb.st_mode))
          {
            /* Even with --sparse=always, try to create holes only
-@@ -709,6 +949,18 @@
+@@ -698,6 +939,18 @@
        buf_alloc = xmalloc (buf_size + buf_alignment_slop);
        buf = ptr_align (buf_alloc, buf_alignment);
  
@@ -305,10 +306,18 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.c /var/tmp/c
 +          }
 +      }
 +
-       for (;;)
+       while (true)
          {
            word *wp = NULL;
-@@ -783,6 +1035,27 @@
+@@ -713,6 +966,7 @@
+               return_val = false;
+               goto close_src_and_dst_desc;
+             }
++
+           if (n_read == 0)
+             break;
+ 
+@@ -772,6 +1026,27 @@
                    return_val = false;
                    goto close_src_and_dst_desc;
                  }
@@ -336,7 +345,7 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.c /var/tmp/c
                last_write_made_hole = false;
  
                /* It is tempting to return early here upon a short read from a
-@@ -792,6 +1065,9 @@
+@@ -781,6 +1056,9 @@
              }
          }
  
@@ -346,9 +355,9 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.c /var/tmp/c
        /* If the file ends with a `hole', we need to do something to record
           the length of the file.  On modern systems, calling ftruncate does
           the job.  On systems without native ftruncate support, we have to
-diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.h /var/tmp/coreutils-8.5.hacked/src/copy.h
---- portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.h	2010-04-20 23:52:04.000000000 +0400
-+++ /var/tmp/coreutils-8.5.hacked/src/copy.h	2010-12-06 22:55:33.000000000 +0300
+diff -ur /var/tmp/portage/sys-apps/coreutils-8.7/work/coreutils-8.7/src/copy.h coreutils-8.7.hacked/src/copy.h
+--- /var/tmp/portage/sys-apps/coreutils-8.7/work/coreutils-8.7/src/copy.h	2010-10-11 21:35:11.000000000 +0400
++++ coreutils-8.7.hacked/src/copy.h	2010-12-22 16:45:09.000000000 +0300
 @@ -99,6 +99,9 @@
  {
    enum backup_type backup_type;
@@ -359,18 +368,18 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/copy.h /var/tmp/c
    /* How to handle symlinks in the source.  */
    enum Dereference_symlink dereference;
  
-diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/cp.c /var/tmp/coreutils-8.5.hacked/src/cp.c
---- portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/cp.c	2010-03-13 18:14:09.000000000 +0300
-+++ /var/tmp/coreutils-8.5.hacked/src/cp.c	2010-12-06 22:58:44.000000000 +0300
-@@ -116,6 +116,7 @@
- {
+diff -ur /var/tmp/portage/sys-apps/coreutils-8.7/work/coreutils-8.7/src/cp.c coreutils-8.7.hacked/src/cp.c
+--- /var/tmp/portage/sys-apps/coreutils-8.7/work/coreutils-8.7/src/cp.c	2010-10-11 21:35:11.000000000 +0400
++++ coreutils-8.7.hacked/src/cp.c	2010-12-22 16:46:38.000000000 +0300
+@@ -118,6 +118,7 @@
    {"archive", no_argument, NULL, 'a'},
+   {"attributes-only", no_argument, NULL, ATTRIBUTES_ONLY_OPTION},
    {"backup", optional_argument, NULL, 'b'},
 +  {"progress", no_argument, NULL, 'B'},
    {"copy-contents", no_argument, NULL, COPY_CONTENTS_OPTION},
    {"dereference", no_argument, NULL, 'L'},
    {"force", no_argument, NULL, 'f'},
-@@ -170,6 +171,7 @@
+@@ -173,6 +174,7 @@
        --backup[=CONTROL]       make a backup of each existing destination file\n\
    -b                           like --backup but does not accept an argument\n\
        --copy-contents          copy contents of special files when recursive\n\
@@ -378,7 +387,7 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/cp.c /var/tmp/cor
    -d                           same as --no-dereference --preserve=links\n\
  "), stdout);
        fputs (_("\
-@@ -760,6 +762,7 @@
+@@ -763,6 +765,7 @@
  static void
  cp_option_init (struct cp_options *x)
  {
@@ -386,7 +395,7 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/cp.c /var/tmp/cor
    cp_options_default (x);
    x->copy_as_regular = true;
    x->dereference = DEREF_UNDEFINED;
-@@ -923,7 +926,7 @@
+@@ -927,7 +930,7 @@
       we'll actually use backup_suffix_string.  */
    backup_suffix_string = getenv ("SIMPLE_BACKUP_SUFFIX");
  
@@ -395,8 +404,8 @@ diff -ur portage/sys-apps/coreutils-8.5/work/coreutils-8.5/src/cp.c /var/tmp/cor
                             long_opts, NULL))
           != -1)
      {
-@@ -962,6 +965,10 @@
-             version_control_string = optarg;
+@@ -970,6 +973,10 @@
+           x.data_copy_required = false;
            break;
  
 +        case 'B':

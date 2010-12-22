@@ -1,21 +1,23 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-apps/coreutils/coreutils-8.5.ebuild,v 1.9 2010/09/18 18:13:32 armin76 Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-apps/coreutils/coreutils-8.7.ebuild,v 1.6 2010/12/14 01:24:12 vapier Exp $
+
+EAPI="3"
 
 inherit eutils flag-o-matic toolchain-funcs
 
 PATCH_VER="1"
 DESCRIPTION="Standard GNU file utilities (chmod, cp, dd, dir, ls...), text utilities (sort, tr, head, wc..), and shell utilities (whoami, who,...)"
 HOMEPAGE="http://www.gnu.org/software/coreutils/"
-SRC_URI="ftp://alpha.gnu.org/gnu/coreutils/${P}.tar.gz
-	mirror://gnu/${PN}/${P}.tar.gz
-	mirror://gentoo/${P}.tar.gz
-	mirror://gentoo/${P}-patches-${PATCH_VER}.tar.lzma
-	http://dev.gentoo.org/~vapier/dist/${P}-patches-${PATCH_VER}.tar.lzma"
+SRC_URI="ftp://alpha.gnu.org/gnu/coreutils/${P}.tar.xz
+	mirror://gnu/${PN}/${P}.tar.xz
+	mirror://gentoo/${P}.tar.xz
+	mirror://gentoo/${P}-patches-${PATCH_VER}.tar.xz
+	http://dev.gentoo.org/~vapier/dist/${P}-patches-${PATCH_VER}.tar.xz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86"
+KEYWORDS="~alpha ~amd64 ~arm hppa ~ia64 ~m68k ~mips ppc ppc64 ~s390 ~sh ~sparc x86"
 IUSE="acl caps gmp nls selinux static unicode vanilla xattr"
 
 RDEPEND="caps? ( sys-libs/libcap )
@@ -35,18 +37,18 @@ RDEPEND="caps? ( sys-libs/libcap )
 DEPEND="${RDEPEND}
 	app-arch/xz-utils"
 
-src_unpack() {
-	unpack ${A}
-	cd "${S}"
-
+src_prepare() {
 	if ! use vanilla ; then
 		use unicode || rm -f "${WORKDIR}"/patch/000_all_coreutils-i18n.patch
 		EPATCH_SUFFIX="patch" \
 		PATCHDIR="${WORKDIR}/patch" \
 		EPATCH_EXCLUDE="001_all_coreutils-gen-progress-bar.patch" \
 		epatch
-		epatch "${FILESDIR}/cp-progressbar.patch"
+		epatch "${FILESDIR}/cp-progressbar-8.7.patch"
 	fi
+
+	# Avoid perl dep for compiled in dircolors default #348642
+	has_version dev-lang/perl || touch src/dircolors.h
 
 	# Since we've patched many .c files, the make process will try to
 	# re-build the manpages by running `./bin --help`.  When doing a
@@ -57,7 +59,7 @@ src_unpack() {
 	tc-is-cross-compiler && touch ${@/%x/1}
 }
 
-src_compile() {
+src_configure() {
 	tc-is-cross-compiler && [[ ${CHOST} == *linux* ]] && export fu_cv_sys_stat_statfs2_bsize=yes #311569
 
 	use static && append-ldflags -static && sed -i '/elf_sys=yes/s:yes:no:' configure #321821
@@ -76,9 +78,7 @@ src_compile() {
 		$(use_enable nls) \
 		$(use_enable acl) \
 		$(use_enable xattr) \
-		$(use_with gmp) \
-		|| die "econf"
-	emake || die "emake"
+		$(use_with gmp)
 }
 
 src_test() {
