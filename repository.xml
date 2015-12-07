@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
+<repositories xmlns="" version="1.0">
+  <repo quality="experimental" status="official">
+    <name>alopatindev-overlay</name>
+    <description lang="en">alopatindev's outdated ebuilds overlay</description>
+    <homepage>https://github.com/alopatindev/gentoo</homepage>
+    <owner type="personal">
+		<email>alopatindev.spamhere@gmail.com</email>
+		<name>alopatindev</name>
+    </owner>
+    <source type="git">git://github.com/alopatindev/gentoo.git</source>
+    <feed>https://github.com/alopatindev/gentoo/commits/master.atom</feed>
+  </repo>
+</repositories>
