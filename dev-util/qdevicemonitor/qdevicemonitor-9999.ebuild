@@ -4,7 +4,7 @@
 
 EAPI="5"
 
-inherit eutils
+inherit eutils qmake-utils
 
 DESCRIPTION="Crossplatform log viewer for Android, iOS and text files"
 HOMEPAGE="https://github.com/alopatindev/qdevicemonitor"
@@ -31,7 +31,7 @@ RDEPEND="dev-qt/qtcore:5"
 src_compile() {
 	cd "${WORKDIR}/${PF}/${PN}"
 	PATH="/usr/lib/qt5/bin:${PATH}"
-	qmake
+	eqmake5
 	emake
 }
 
