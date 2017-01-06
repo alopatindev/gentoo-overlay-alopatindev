@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI="5"
+EAPI="6"
 
 inherit eutils qmake-utils
 
@@ -10,37 +10,38 @@ DESCRIPTION="Crossplatform log viewer for Android, iOS and text files"
 HOMEPAGE="https://github.com/alopatindev/qdevicemonitor"
 
 if [[ ${PV} == "9999" ]] ; then
-	inherit git-2
+	inherit git-r3
 	EGIT_REPO_URI="git://github.com/alopatindev/qdevicemonitor"
 else
 	SRC_URI="https://github.com/alopatindev/qdevicemonitor/archive/${PV}.tar.gz -> ${P}.tar.gz"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND="
+RDEPEND="
+	dev-qt/qtcore:5
 	dev-qt/qtgui:5
 	dev-util/android-tools
-	app-pda/usbmuxd
-	app-pda/libimobiledevice"
-RDEPEND="dev-qt/qtcore:5"
+	app-pda/usbmuxd"
+DEPEND="${RDEPEND}"
+
+src_configure() {
+	cd "${PN}" || die
+	export VERSION_WITH_BUILD_NUMBER="${PV}"
+	eqmake5
+}
 
 src_compile() {
-	cd "${WORKDIR}/${PF}/${PN}"
-	PATH="/usr/lib/qt5/bin:${PATH}"
-	eqmake5
+	cd "${PN}" || die
 	emake
 }
 
 src_install() {
-	cd "${WORKDIR}/${PF}"
+	dobin "${PN}/${PN}"
 	dodoc README.md
-	insinto /usr/bin
 	newicon -s scalable "icons/app_icon.svg" "${PN}.svg"
 	domenu "icons/${PN}.desktop"
-	doins "${PN}/${PN}"
-	fperms 755 "/usr/bin/${PN}"
 }
