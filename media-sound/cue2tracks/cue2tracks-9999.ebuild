@@ -1,16 +1,17 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit eutils
+EAPI="6"
+
+inherit eutils git-r3
 
 DESCRIPTION="Bash script for split audio CD image files with cue sheet to tracks and write tags."
 HOMEPAGE="http://code.google.com/p/cue2tracks/"
-SRC_URI="https://github.com/ar-lex/cue2tracks/archive/v${PV}.tar.gz"
+EGIT_REPO_URI="git://github.com/ar-lex/cue2tracks"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~x86 ~amd64"
 IUSE="flake mac tta shorten wavpack mp3 m4a vorbis"
 
 DEPEND=""
