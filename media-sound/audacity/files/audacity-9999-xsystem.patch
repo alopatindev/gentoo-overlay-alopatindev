@@ -1,0 +1,22 @@
+diff --git a/lib-src/libnyquist/nyx.c b/lib-src/libnyquist/nyx.c
+index 59973f60c..a5e770732 100644
+--- a/lib-src/libnyquist/nyx.c
++++ b/lib-src/libnyquist/nyx.c
+@@ -1327,12 +1327,11 @@ void oscheck(void)
+ /* xsystem - execute a system command */
+ LVAL xsystem()
+ {
+-   if (moreargs()) {
+-      unsigned char *cmd;
+-      cmd = (unsigned char *)getstring(xlgastring());
+-      fprintf(stderr, "Will not execute system command: %s\n", cmd);
+-   }
+-   return s_true;
++   char *cmd="COMMAND";
++   if (moreargs())
++      cmd = (char *)getstring(xlgastring());
++   xllastarg();
++   return (system(cmd) == 0 ? s_true : cvfixnum((FIXTYPE)errno));
+ }
+ 
+ /* xsetdir -- set current directory of the process */

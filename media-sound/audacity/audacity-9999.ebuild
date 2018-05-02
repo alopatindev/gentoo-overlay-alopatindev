@@ -58,6 +58,7 @@ PATCHES=(
 	#"${FILESDIR}/${PN}-2.2.1-portmixer.patch" #624264
 	"${FILESDIR}/${PN}-2.2.2-automake.patch" # or else eautoreconf breaks
 	#"${FILESDIR}/${PN}-2.2.2-midi.patch" #637110
+	"${FILESDIR}/audacity-9999-xsystem.patch" # https://forum.audacityteam.org/viewtopic.php?p=346798#p346798
 )
 
 src_prepare() {
@@ -77,6 +78,7 @@ src_configure() {
 	# * options listed in the order that configure --help lists them
 	local myeconfargs=(
 		--disable-dynamic-loading
+		--enable-debug
 		--enable-nyquist
 		--enable-unicode
 		--with-expat=system
