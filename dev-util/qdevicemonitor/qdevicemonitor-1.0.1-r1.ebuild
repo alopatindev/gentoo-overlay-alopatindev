@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -27,6 +27,8 @@ RDEPEND="
 	dev-util/android-tools
 	app-pda/usbmuxd"
 DEPEND="${RDEPEND}"
+
+PATCHES=( "${FILESDIR}"/${P}-qt-5.11.patch )
 
 src_configure() {
 	cd "${PN}" || die

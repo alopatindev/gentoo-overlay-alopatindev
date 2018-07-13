@@ -1,0 +1,39 @@
+From d46ea62810269162ba7ceb88348c8d042c62de5c Mon Sep 17 00:00:00 2001
+From: Alexander Lopatin <alopatindev@gmail.com>
+Date: Fri, 13 Jul 2018 12:30:38 +0300
+Subject: [PATCH] fix Qt 5.11 specific issues https://bugs.gentoo.org/660932
+
+---
+ qdevicemonitor/devices/DeviceFacade.cpp | 2 +-
+ qdevicemonitor/ui/MainWindow.cpp        | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/qdevicemonitor/devices/DeviceFacade.cpp b/qdevicemonitor/devices/DeviceFacade.cpp
+index ced04b3..6df67eb 100644
+--- a/qdevicemonitor/devices/DeviceFacade.cpp
++++ b/qdevicemonitor/devices/DeviceFacade.cpp
+@@ -151,8 +151,8 @@ void DeviceFacade::loadSettings(const QSettings& s)
+     if (darkTheme.isValid())
+     {
+         m_darkTheme = darkTheme.toBool();
+-        m_colorTheme = ColorTheme::create(m_darkTheme);
+     }
++    m_colorTheme = ColorTheme::create(m_darkTheme);
+ 
+     const QVariant clearAndroidLog = s.value("clearAndroidLog");
+     if (clearAndroidLog.isValid())
+diff --git a/qdevicemonitor/ui/MainWindow.cpp b/qdevicemonitor/ui/MainWindow.cpp
+index c1bf263..fc22b4d 100644
+--- a/qdevicemonitor/ui/MainWindow.cpp
++++ b/qdevicemonitor/ui/MainWindow.cpp
+@@ -31,6 +31,7 @@
+ #include <QProcess>
+ #include <QSettings>
+ #include <QStringList>
++#include <QTabBar>
+ #include <QtCore/QStringBuilder>
+ 
+ #if defined(Q_OS_WIN32)
+-- 
+2.17.1
+
