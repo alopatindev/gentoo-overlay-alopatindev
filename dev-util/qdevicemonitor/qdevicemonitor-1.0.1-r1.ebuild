@@ -1,6 +1,5 @@
 # Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
 
 EAPI="6"
 
@@ -11,7 +10,7 @@ HOMEPAGE="https://github.com/alopatindev/qdevicemonitor"
 
 if [[ ${PV} == "9999" ]] ; then
 	inherit git-r3
-	EGIT_REPO_URI="git://github.com/alopatindev/qdevicemonitor"
+	EGIT_REPO_URI="https://github.com/alopatindev/${PN}"
 else
 	SRC_URI="https://github.com/alopatindev/qdevicemonitor/archive/${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
@@ -28,7 +27,7 @@ RDEPEND="
 	app-pda/usbmuxd"
 DEPEND="${RDEPEND}"
 
-PATCHES=( "${FILESDIR}"/${P}-qt-5.11.patch )
+PATCHES=( "${FILESDIR}"/${P}-qt-5.11.patch "${FILESDIR}"/${P}-crash-after-fresh-install.patch )
 
 src_configure() {
 	cd "${PN}" || die
