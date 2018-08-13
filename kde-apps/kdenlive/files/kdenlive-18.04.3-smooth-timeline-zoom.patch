@@ -1,0 +1,31 @@
+--- ../../kdenlive-18.04.3-r1_orig/work/kdenlive-18.04.3/src/mainwindow.cpp	2018-07-07 12:25:07.000000000 +0300
++++ kdenlive-18.04.3/src/mainwindow.cpp	2018-08-13 23:42:49.931762655 +0300
+@@ -1146,7 +1146,7 @@
+     m_zoomOut->setShortcut(Qt::CTRL + Qt::Key_Minus);
+ 
+     m_zoomSlider = new QSlider(Qt::Horizontal, this);
+-    m_zoomSlider->setMaximum(13);
++    m_zoomSlider->setMaximum(100);
+     m_zoomSlider->setPageStep(1);
+     m_zoomSlider->setInvertedAppearance(true);
+     m_zoomSlider->setInvertedControls(true);
+@@ -2757,7 +2757,8 @@
+     value = qBound(m_zoomSlider->minimum(), value, m_zoomSlider->maximum());
+ 
+     if (pCore->projectManager()->currentTimeline()) {
+-        pCore->projectManager()->currentTimeline()->slotChangeZoom(value, -1, zoomOnMouse);
++        const int timelineZoomLevel = (value * 13) / m_zoomSlider->maximum();
++        pCore->projectManager()->currentTimeline()->slotChangeZoom(timelineZoomLevel, -1, zoomOnMouse);
+     }
+ 
+     m_zoomOut->setEnabled(value < m_zoomSlider->maximum());
+@@ -2783,7 +2784,8 @@
+ 
+ void MainWindow::slotUpdateZoomSliderToolTip(int zoomlevel)
+ {
+-    m_zoomSlider->setToolTip(i18n("Zoom Level: %1/13", (13 - zoomlevel)));
++    const int maxZoomLevel = m_zoomSlider->maximum();
++    m_zoomSlider->setToolTip(i18n("Zoom Level: %1/%2", (maxZoomLevel - zoomlevel), maxZoomLevel));
+ }
+ 
+ void MainWindow::slotGotProgressInfo(const QString &message, int progress, MessageType type)

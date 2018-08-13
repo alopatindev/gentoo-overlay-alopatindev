@@ -1,0 +1,32 @@
+diff --git a/src/widgets/kernel/qwidgetwindow.cpp b/src/widgets/kernel/qwidgetwindow.cpp
+index 1f3057b008..78768fed65 100644
+--- a/src/widgets/kernel/qwidgetwindow.cpp
++++ b/src/widgets/kernel/qwidgetwindow.cpp
+@@ -815,6 +815,14 @@ void QWidgetWindow::handleCloseEvent(QCloseEvent *event)
+ }
+ 
+ #if QT_CONFIG(wheelevent)
++static QPoint clampPoint(const QPoint& p)
++{
++    const int max = 1;
++    const int min = -max;
++    const int dx = qBound(min, p.x(), max);
++    const int dy = qBound(min, p.y(), max);
++    return QPoint(dx, dy);
++}
+ 
+ void QWidgetWindow::handleWheelEvent(QWheelEvent *event)
+ {
+@@ -840,8 +848,10 @@ void QWidgetWindow::handleWheelEvent(QWheelEvent *event)
+ 
+     QPoint mapped = widget->mapFrom(rootWidget, pos);
+ 
+-    QWheelEvent translated(mapped, event->globalPos(), event->pixelDelta(), event->angleDelta(), event->delta(), event->orientation(), event->buttons(), event->modifiers(), event->phase(), event->source(), event->inverted());
+-    QGuiApplication::forwardEvent(widget, &translated, event);
++    if (event->angleDelta().x() != 0 || event->angleDelta().y() != 0) {
++        QWheelEvent translated(mapped, event->globalPos(), clampPoint(event->pixelDelta()), clampPoint(event->angleDelta()), event->delta(), event->orientation(), event->buttons(), event->modifiers(), event->phase(), event->source(), event->inverted());
++        QGuiApplication::forwardEvent(widget, &translated, event);
++    }
+ }
+ 
+ #endif // QT_CONFIG(wheelevent)
