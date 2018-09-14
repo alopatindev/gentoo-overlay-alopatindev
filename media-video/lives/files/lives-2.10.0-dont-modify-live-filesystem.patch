@@ -1,0 +1,11 @@
+--- libweed/Makefile.am.orig	2015-04-26 18:24:27.478211807 +0200
++++ libweed/Makefile.am	2015-04-26 18:24:48.410211572 +0200
+@@ -79,7 +79,7 @@ uninstall-local:
+ 
+ 
+ install-exec-hook:
+-	rm -f /usr/lib/libweed*.la
++#	rm -f /usr/lib/libweed*.la
+ ## The following is removed as it breaks packaging.
+ #	/sbin/ldconfig
+ 

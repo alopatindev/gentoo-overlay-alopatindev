@@ -1,0 +1,10 @@
+--- ./libOSC/sendOSC/htmsocket.c.orig	2018-09-10 02:02:25.821156535 +0300
++++ ./libOSC/sendOSC/htmsocket.c	2018-09-10 02:02:26.946156472 +0300
+@@ -45,7 +45,6 @@
+ #include <netinet/in.h>
+ #include <sys/time.h>
+ 
+-#include <rpc/rpc.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <sys/times.h>
