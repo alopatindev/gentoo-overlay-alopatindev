@@ -1,0 +1,39 @@
+diff -u a/common/flatpak-context.c b/common/flatpak-context.c
+--- a/common/flatpak-context.c	2018-11-16 13:31:49.000000000 +0300
++++ b/common/flatpak-context.c	2018-12-05 13:49:13.888321314 +0300
+@@ -67,6 +67,7 @@
+   "dri",
+   "all",
+   "kvm",
++  "alsa",
+   NULL
+ };
+ 
+diff -u a/common/flatpak-context-private.h b/common/flatpak-context-private.h
+--- a/common/flatpak-context-private.h	2018-11-16 13:31:49.000000000 +0300
++++ b/common/flatpak-context-private.h	2018-12-05 13:48:53.672322433 +0300
+@@ -47,6 +47,7 @@
+   FLATPAK_CONTEXT_DEVICE_DRI         = 1 << 0,
+   FLATPAK_CONTEXT_DEVICE_ALL         = 1 << 1,
+   FLATPAK_CONTEXT_DEVICE_KVM         = 1 << 2,
++  FLATPAK_CONTEXT_DEVICE_ALSA        = 1 << 3,
+ } FlatpakContextDevices;
+ 
+ typedef enum {
+diff -u a/common/flatpak-run.c b/common/flatpak-run.c
+--- a/common/flatpak-run.c	2018-11-16 13:39:15.000000000 +0300
++++ b/common/flatpak-run.c	2018-12-05 14:14:31.971237345 +0300
+@@ -1088,6 +1088,13 @@
+           if (g_file_test ("/dev/kvm", G_FILE_TEST_EXISTS))
+             flatpak_bwrap_add_args (bwrap, "--dev-bind", "/dev/kvm", "/dev/kvm", NULL);
+         }
++
++      if (context->devices & FLATPAK_CONTEXT_DEVICE_ALSA)
++        {
++          g_debug ("Allowing ALSA access");
++          if (g_file_test ("/dev/snd", G_FILE_TEST_EXISTS))
++            flatpak_bwrap_add_args (bwrap, "--dev-bind", "/dev/snd", "/dev/snd", NULL);
++        }
+     }
+ 
+   flatpak_context_append_bwrap_filesystem (context, bwrap, app_id, app_id_dir, &exports);
