@@ -21,7 +21,7 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 # Do not forget to check pitivi/check.py for dependencies!!!
 # pycanberra, libav, libnotify and liwnck are optional
-GST_VER="1.10.2"
+GST_VER="1.14.2"
 
 COMMON_DEPEND="
 	${PYTHON_DEPS}
@@ -34,7 +34,7 @@ COMMON_DEPEND="
 RDEPEND="${COMMON_DEPEND}
 	>=dev-libs/glib-2.30.0:2
 
-	>=dev-libs/gobject-introspection-1.34:=
+	>=dev-libs/gobject-introspection-1.56:=
 	dev-python/dbus-python[${PYTHON_USEDEP}]
 	>=dev-python/gst-python-1.4:1.0[${PYTHON_USEDEP}]
 	dev-python/matplotlib[${PYTHON_USEDEP}]
@@ -50,6 +50,10 @@ RDEPEND="${COMMON_DEPEND}
 	>=media-libs/gst-plugins-good-${GST_VER}:1.0
 	>=media-plugins/gst-plugins-libav-${GST_VER}:1.0
 	>=media-plugins/gst-plugins-gdkpixbuf-${GST_VER}:1.0
+	>=media-plugins/gst-plugins-opus-${GST_VER}:1.0
+	>=media-plugins/gst-plugins-jpeg-${GST_VER}:1.0
+	>=media-plugins/gst-plugins-x264-${GST_VER}:1.0
+	media-plugins/gst-plugins-alsa
 
 	x11-libs/libnotify[introspection]
 	x11-libs/libwnck:3[introspection]
@@ -66,11 +70,6 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig
 	test? ( dev-python/nose2[${PYTHON_USEDEP}] )
 "
-
-PATCHES=(
-	# Make tests optional, bug #594096
-	"${FILESDIR}"/${P}-optional-tests.patch
-)
 
 src_configure() {
 	local emesonargs=(
