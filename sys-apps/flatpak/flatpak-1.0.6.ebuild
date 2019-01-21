@@ -75,18 +75,20 @@ pkg_setup() {
 
 pkg_postinst() {
 	use alsa && {
-		einfo "To run application with alsa support, use"
-		einfo "flatpak run --device=alsa ..."
-		einfo ""
-		einfo "ALSA may still not work properly (for instance in Pitivi)"
-		einfo "because alsa-lib might be configured and built with --with-versioned"
-		einfo "which causes some boring errors."
-		einfo ""
-		einfo "As a workaround just replace libasound.so with your system version:"
-		einfo "find /var/lib/flatpak -type f -name libasound.so.2.0.0 -print0 | xargs -0 cp /usr/lib64/libasound.so.2.0.0"
-		einfo ""
-		einfo "Also you may need to remove PulseAudio configurations:"
-		einfo "rm /var/lib/flatpak/runtime/org.gnome.Platform/x86_64/*/*/files/share/alsa/alsa.conf.d/*pulseaudio*.conf"
+		elog "To run application with alsa support, use"
+		elog "flatpak run --device=alsa ..."
+		elog ""
+		elog "After installing software with flatpak, you will still likely run into issues with ALSA."
+		elog ""
+		elog "1. To disable PulseAudio you will need to remove its configuration files:"
+		elog "sudo find {/var/lib,~/.local/share}/flatpak/runtime -type f -name '*pulseaudio*.conf' -delete"
+		elog ""
+		elog "2. Flatpak's alsa-lib is probably configured and built with --with-versioned"
+		elog "which causes 'unable to verify version for symbol _snd_pcm_empty_open' error."
+		elog ""
+		elog "As a workaround just replace libasound.so with your system version:"
+		elog "sudo find /var/lib/flatpak -type f -name libasound.so.2.0.0 -exec cp /usr/lib64/libasound.so.2.0.0 {} \;"
+		elog "find ~/.local/share/flatpak -type f -name libasound.so.2.0.0 -exec cp /usr/lib64/libasound.so.2.0.0 {} \;"
 	}
 }
 
