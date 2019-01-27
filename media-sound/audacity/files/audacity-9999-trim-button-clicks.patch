@@ -1,0 +1,29 @@
+diff --git a/src/AudioIO.cpp b/src/AudioIO.cpp
+index 4fbfd4147..d3e0b1711 100644
+--- a/src/AudioIO.cpp
++++ b/src/AudioIO.cpp
+@@ -4021,6 +4021,11 @@ void AudioIO::FillBuffers()
+                   }
+                }
+ 
++               if (discarded == 0 && !mAudioThreadFillBuffersLoopRunning)
++               {
++                  discarded = avail;
++               }
++
+                wxASSERT(discarded <= avail);
+                size_t toGet = avail - discarded;
+                SampleBuffer temp;
+diff --git a/src/toolbars/ControlToolBar.cpp b/src/toolbars/ControlToolBar.cpp
+index 7425de38a..8ecec235b 100644
+--- a/src/toolbars/ControlToolBar.cpp
++++ b/src/toolbars/ControlToolBar.cpp
+@@ -969,6 +969,8 @@ void ControlToolBar::OnRecord(wxCommandEvent &evt)
+    if (!p)
+       return;
+ 
++   wxMilliSleep(500);
++
+    bool altAppearance = mRecord->WasShiftDown();
+    if (evt.GetInt() == 1) // used when called by keyboard shortcut. Default (0) ignored.
+       altAppearance = true;
