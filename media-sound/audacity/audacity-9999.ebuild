@@ -22,8 +22,8 @@ fi
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~mips ~ppc ~ppc64 ~x86"
-IUSE="alsa cpu_flags_x86_sse doc ffmpeg +flac id3tag jack +ladspa +lame libav
-	+lv2 mad +midi nls +portmixer sbsms +soundtouch twolame vamp +vorbis +vst +customizations"
+IUSE="alsa cpu_flags_x86_sse +customizations +debug doc ffmpeg +flac id3tag jack +ladspa +lame libav
+	+lv2 mad +midi -mod-script-pipe nls +portmixer sbsms +soundtouch +system-libs twolame vamp +vorbis +vst"
 RESTRICT="test"
 
 RDEPEND=">=app-arch/zip-2.3
@@ -79,40 +79,44 @@ src_configure() {
 	local WX_GTK_VER="3.1"
 	need-wxwidgets unicode
 
+	local LIB_LOCATION=local
+	use system-libs && LIB_LOCATION=system
+
 	# * always use system libraries if possible
 	# * options listed in the order that configure --help lists them
 	local myeconfargs=(
-		--disable-dynamic-loading
-		--enable-debug
+		#--disable-dynamic-loading
+		--with-expat=${LIB_LOCATION}
+		--with-libsndfile=${LIB_LOCATION}
+		--with-libsoxr=${LIB_LOCATION}
+		--with-widgetextra=local
+		$(use_enable debug)
 		--enable-nyquist
 		--enable-unicode
-		--with-expat=system
-		--with-libsndfile=system
-		--with-libsoxr=system
-		--with-mod-script-pipe
+		$(use_with mod-script-pipe)
 		--with-portaudio
-		--with-widgetextra=local
 		--with-wx-version=${WX_GTK_VER}
 		$(use_enable cpu_flags_x86_sse sse)
 		$(use_enable ladspa)
 		$(use_enable nls)
 		$(use_enable vst)
 		#$(use_with alsa)
-		$(use_with ffmpeg)
-		$(use_with flac libflac)
-		$(use_with id3tag libid3tag)
+		$(use_with ffmpeg)=${LIB_LOCATION}
+		$(use_with flac libflac)=${LIB_LOCATION}
+		$(use_with id3tag libid3tag)=${LIB_LOCATION}
 		#$(use_with jack)
-		$(use_with lame)
+		$(use_with lame)=${LIB_LOCATION}
 		$(use_with lv2)
-		$(use_with mad libmad)
+		$(use_with mad libmad)=${LIB_LOCATION}
 		$(use_with midi)
 		$(use_with sbsms)
-		$(use_with soundtouch)
-		$(use_with twolame libtwolame)
-		$(use_with vamp libvamp)
-		$(use_with vorbis libvorbis)
+		$(use_with soundtouch)=${LIB_LOCATION}
+		$(use_with twolame libtwolame)=${LIB_LOCATION}
+		$(use_with vamp libvamp)=${LIB_LOCATION}
+		$(use_with vorbis libvorbis)=${LIB_LOCATION}
 		$(use_with portmixer)
 	)
+
 	econf "${myeconfargs[@]}"
 }
 
