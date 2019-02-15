@@ -23,7 +23,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~mips ~ppc ~ppc64 ~x86"
 IUSE="alsa cpu_flags_x86_sse +customizations +debug doc ffmpeg +flac id3tag jack +ladspa +lame libav
-	+lv2 mad +midi -mod-script-pipe nls +portmixer sbsms +soundtouch +system-libs twolame vamp +vorbis +vst"
+	+lv2 mad +midi -mod-script-pipe nls +portmixer sbsms +soundtouch -system-libs twolame vamp +vorbis +vst"
 RESTRICT="test"
 
 RDEPEND=">=app-arch/zip-2.3
@@ -54,19 +54,12 @@ DEPEND="${RDEPEND}
 
 REQUIRED_USE="soundtouch? ( midi )"
 
-PATCHES=(
-	#"${FILESDIR}/${PN}-2.2.1-portmixer.patch" #624264
-	"${FILESDIR}/${PN}-2.2.2-automake.patch" # or else eautoreconf breaks
-	#"${FILESDIR}/${PN}-2.2.2-midi.patch" #637110
-)
-
 CUSTOMIZATION_PATCHES=(
 	"${FILESDIR}/audacity-9999-xsystem.patch" # https://forum.audacityteam.org/viewtopic.php?p=346798#p346798
 	"${FILESDIR}/audacity-9999-trim-button-clicks.patch"
 )
 
 src_prepare() {
-	epatch "${PATCHES[@]}"
 	use customizations && epatch "${CUSTOMIZATION_PATCHES[@]}"
 
 	# needed because of portmixer patch
@@ -79,17 +72,14 @@ src_configure() {
 	local WX_GTK_VER="3.1"
 	need-wxwidgets unicode
 
-	local LIB_LOCATION=local
-	use system-libs && LIB_LOCATION=system
+	local LIB_PREFERENCE="local system"
+	use system-libs && LIB_PREFERENCE="system local"
 
 	# * always use system libraries if possible
 	# * options listed in the order that configure --help lists them
 	local myeconfargs=(
+		--with-lib-preference="${LIB_PREFERENCE}"
 		#--disable-dynamic-loading
-		--with-expat=${LIB_LOCATION}
-		--with-libsndfile=${LIB_LOCATION}
-		--with-libsoxr=${LIB_LOCATION}
-		--with-widgetextra=local
 		$(use_enable debug)
 		--enable-nyquist
 		--enable-unicode
@@ -101,19 +91,19 @@ src_configure() {
 		$(use_enable nls)
 		$(use_enable vst)
 		#$(use_with alsa)
-		$(use_with ffmpeg)=${LIB_LOCATION}
-		$(use_with flac libflac)=${LIB_LOCATION}
-		$(use_with id3tag libid3tag)=${LIB_LOCATION}
+		$(use_with ffmpeg)
+		$(use_with flac libflac)
+		$(use_with id3tag libid3tag)
 		#$(use_with jack)
-		$(use_with lame)=${LIB_LOCATION}
+		$(use_with lame)
 		$(use_with lv2)
-		$(use_with mad libmad)=${LIB_LOCATION}
+		$(use_with mad libmad)
 		$(use_with midi)
 		$(use_with sbsms)
-		$(use_with soundtouch)=${LIB_LOCATION}
-		$(use_with twolame libtwolame)=${LIB_LOCATION}
-		$(use_with vamp libvamp)=${LIB_LOCATION}
-		$(use_with vorbis libvorbis)=${LIB_LOCATION}
+		$(use_with soundtouch)
+		$(use_with twolame libtwolame)
+		$(use_with vamp libvamp)
+		$(use_with vorbis libvorbis)
 		$(use_with portmixer)
 	)
 
