@@ -23,7 +23,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~mips ~ppc ~ppc64 ~x86"
 IUSE="alsa cpu_flags_x86_sse doc ffmpeg +flac id3tag jack +ladspa +lame libav
-	+lv2 mad +midi nls +portmixer sbsms +soundtouch twolame vamp +vorbis +vst"
+	+lv2 mad +midi nls +portmixer sbsms +soundtouch twolame vamp +vorbis +vst +customizations"
 RESTRICT="test"
 
 RDEPEND=">=app-arch/zip-2.3
@@ -31,7 +31,7 @@ RDEPEND=">=app-arch/zip-2.3
 	>=media-libs/libsndfile-1.0.0
 	=media-libs/portaudio-19*
 	media-libs/soxr
-	x11-libs/wxGTK:3.0[X]
+	=x11-libs/wxGTK-9999[X]
 	alsa? ( media-libs/alsa-lib )
 	ffmpeg? ( libav? ( media-video/libav:= )
 		!libav? ( >=media-video/ffmpeg-1.2:= ) )
@@ -58,12 +58,16 @@ PATCHES=(
 	#"${FILESDIR}/${PN}-2.2.1-portmixer.patch" #624264
 	"${FILESDIR}/${PN}-2.2.2-automake.patch" # or else eautoreconf breaks
 	#"${FILESDIR}/${PN}-2.2.2-midi.patch" #637110
+)
+
+CUSTOMIZATION_PATCHES=(
 	"${FILESDIR}/audacity-9999-xsystem.patch" # https://forum.audacityteam.org/viewtopic.php?p=346798#p346798
 	"${FILESDIR}/audacity-9999-trim-button-clicks.patch"
 )
 
 src_prepare() {
 	epatch "${PATCHES[@]}"
+	use customizations && epatch "${CUSTOMIZATION_PATCHES[@]}"
 
 	# needed because of portmixer patch
 	eautoreconf
@@ -72,7 +76,7 @@ src_prepare() {
 }
 
 src_configure() {
-	local WX_GTK_VER="3.0"
+	local WX_GTK_VER="3.1"
 	need-wxwidgets unicode
 
 	# * always use system libraries if possible

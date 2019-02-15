@@ -1,13 +1,14 @@
 diff --git a/src/AudioIO.cpp b/src/AudioIO.cpp
-index 4fbfd4147..1f1b974db 100644
+index 4fbfd4147..27afecdcf 100644
 --- a/src/AudioIO.cpp
 +++ b/src/AudioIO.cpp
-@@ -2644,6 +2644,15 @@ void AudioIO::StopStream()
+@@ -2644,6 +2644,16 @@ void AudioIO::StopStream()
              }
           }
  
-+         double endClipCorrection;
-+         gPrefs->Read(wxT("/AudioIO/EndClipCorrection"), &endClipCorrection, DEFAULT_CLIP_CORRECTION);
++         long endClipCorrectionMs;
++         gPrefs->Read(wxT("/AudioIO/EndClipCorrection"), &endClipCorrectionMs, DEFAULT_CLIP_CORRECTION_MS);
++         const float endClipCorrection = static_cast<float>(endClipCorrectionMs) / 1000.0;
 +         for (auto &track : mCaptureTracks) {
 +            GuardedCall([&] {
 +               const double newClipTime = std::max(0.0, track->GetEndTime() - endClipCorrection);
@@ -19,19 +20,19 @@ index 4fbfd4147..1f1b974db 100644
           bar->CommitRecording();
        }
 diff --git a/src/AudioIO.h b/src/AudioIO.h
-index a91272a80..b13a37e99 100644
+index a91272a80..8eaed5670 100644
 --- a/src/AudioIO.h
 +++ b/src/AudioIO.h
 @@ -85,6 +85,7 @@ class AudioIOListener;
  
  #define DEFAULT_LATENCY_DURATION 100.0
  #define DEFAULT_LATENCY_CORRECTION -130.0
-+#define DEFAULT_CLIP_CORRECTION 0.3
++#define DEFAULT_CLIP_CORRECTION_MS 300
  
  #define AUDIO_PRE_ROLL_KEY (wxT("/AudioIO/PreRoll"))
  #define DEFAULT_PRE_ROLL_SECONDS 5.0
 diff --git a/src/prefs/DevicePrefs.cpp b/src/prefs/DevicePrefs.cpp
-index 73e4d984b..13f00c3b9 100644
+index 73e4d984b..c08bd8660 100644
 --- a/src/prefs/DevicePrefs.cpp
 +++ b/src/prefs/DevicePrefs.cpp
 @@ -185,6 +185,20 @@ void DevicePrefs::PopulateOrExchange(ShuttleGui & S)
@@ -41,14 +42,14 @@ index 73e4d984b..13f00c3b9 100644
 +
 +         w = S.TieNumericTextBox(_("Begin Clip Correction:"),
 +                                 wxT("/AudioIO/BeginClipCorrection"),
-+                                 DEFAULT_CLIP_CORRECTION,
++                                 DEFAULT_CLIP_CORRECTION_MS,
 +                                 9);
 +         S.AddUnits(_("milliseconds"));
 +         if( w ) w->SetName(w->GetName() + wxT(" ") + _("milliseconds"));
 +
 +         w = S.TieNumericTextBox(_("End Clip Correction:"),
 +                                 wxT("/AudioIO/EndClipCorrection"),
-+                                 DEFAULT_CLIP_CORRECTION,
++                                 DEFAULT_CLIP_CORRECTION_MS,
 +                                 9);
 +         S.AddUnits(_("milliseconds"));
 +         if( w ) w->SetName(w->GetName() + wxT(" ") + _("milliseconds"));
@@ -56,16 +57,15 @@ index 73e4d984b..13f00c3b9 100644
        S.EndThreeColumn();
     }
 diff --git a/src/toolbars/ControlToolBar.cpp b/src/toolbars/ControlToolBar.cpp
-index 7425de38a..7659362aa 100644
+index 7425de38a..eb4727e24 100644
 --- a/src/toolbars/ControlToolBar.cpp
 +++ b/src/toolbars/ControlToolBar.cpp
-@@ -969,6 +969,11 @@ void ControlToolBar::OnRecord(wxCommandEvent &evt)
+@@ -969,6 +969,10 @@ void ControlToolBar::OnRecord(wxCommandEvent &evt)
     if (!p)
        return;
  
-+   double beginClipCorrection;
-+   gPrefs->Read(wxT("/AudioIO/BeginClipCorrection"), &beginClipCorrection, DEFAULT_CLIP_CORRECTION);
-+   const unsigned long beginClipCorrectionMs = static_cast<unsigned long>(beginClipCorrection * 1000.0);
++   long beginClipCorrectionMs;
++   gPrefs->Read(wxT("/AudioIO/BeginClipCorrection"), &beginClipCorrectionMs, DEFAULT_CLIP_CORRECTION_MS);
 +   wxMilliSleep(beginClipCorrectionMs);
 +
     bool altAppearance = mRecord->WasShiftDown();
