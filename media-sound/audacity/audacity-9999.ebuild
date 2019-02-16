@@ -57,6 +57,7 @@ REQUIRED_USE="soundtouch? ( midi )"
 CUSTOMIZATION_PATCHES=(
 	"${FILESDIR}/audacity-9999-xsystem.patch" # https://forum.audacityteam.org/viewtopic.php?p=346798#p346798
 	"${FILESDIR}/audacity-9999-trim-button-clicks.patch"
+	"${FILESDIR}/audacity-9999-auto-punch.patch" # https://forum.audacityteam.org/viewtopic.php?f=39&t=103670
 )
 
 src_prepare() {

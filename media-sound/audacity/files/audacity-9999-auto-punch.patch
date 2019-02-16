@@ -1,0 +1,327 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 07b96bb3c..cc0827acf 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -234,6 +234,7 @@ source_group( commands FILES ${COMMANDS_SOURCE} )
+ set( EFFECTS_SOURCE
+    ${CMAKE_SOURCE_DIRECTORY}effects/Amplify.cpp
+    ${CMAKE_SOURCE_DIRECTORY}effects/AutoDuck.cpp
++   ${CMAKE_SOURCE_DIRECTORY}effects/AutoPunch.cpp
+    ${CMAKE_SOURCE_DIRECTORY}effects/BassTreble.cpp
+    ${CMAKE_SOURCE_DIRECTORY}effects/Biquad.cpp
+    ${CMAKE_SOURCE_DIRECTORY}effects/ChangePitch.cpp
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 75c7691b7..e4db14be2 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -352,6 +352,8 @@ audacity_SOURCES = \
+ 	effects/Amplify.h \
+ 	effects/AutoDuck.cpp \
+ 	effects/AutoDuck.h \
++	effects/AutoPunch.cpp \
++	effects/AutoPunch.h \
+ 	effects/BassTreble.cpp \
+ 	effects/BassTreble.h \
+ 	effects/Biquad.cpp \
+diff --git a/src/effects/AutoPunch.cpp b/src/effects/AutoPunch.cpp
+new file mode 100644
+index 000000000..0b1d4edf0
+--- /dev/null
++++ b/src/effects/AutoPunch.cpp
+@@ -0,0 +1,221 @@
++// Copyright (C) 2019 Alexander Lopatin
++
++#include "../Audacity.h"
++#include "../LabelTrack.h"
++
++#include <wx/intl.h>
++
++#include "AutoPunch.h"
++
++static const double MAX_NOISE_DURATION = 10.0;
++FloatBuffers EffectAutoPunch::sNoise;
++sampleCount EffectAutoPunch::sNoiseSize = 0;
++
++const double FADE_DURATION = 0.25;
++const double SOUND_FADEIN_DURATION = FADE_DURATION * 0.05;
++
++EffectAutoPunch::EffectAutoPunch(bool copy)
++   : mCopy(copy)
++   , mRate(0)
++   , mNoiseIndex(0)
++   , mSilentRegionIndex(0)
++   , mTrackPosition(0)
++{
++}
++
++EffectAutoPunch::~EffectAutoPunch()
++{
++}
++
++ComponentInterfaceSymbol EffectAutoPunch::GetSymbol()
++{
++   return mCopy ? AUTOPUNCHCOPY_PLUGIN_SYMBOL : AUTOPUNCHPASTE_PLUGIN_SYMBOL;
++}
++
++wxString EffectAutoPunch::GetDescription()
++{
++   return mCopy ? _("Copy background noise") : _("Paste noise to silent places");
++}
++
++EffectType EffectAutoPunch::GetType()
++{
++   return EffectTypeProcess;
++}
++
++bool EffectAutoPunch::IsInteractive()
++{
++   return false;
++}
++
++unsigned EffectAutoPunch::GetAudioInCount()
++{
++   return 1;
++}
++
++unsigned EffectAutoPunch::GetAudioOutCount()
++{
++   return 1;
++}
++
++bool EffectAutoPunch::ProcessInitialize(sampleCount WXUNUSED(totalLen), ChannelNames WXUNUSED(chanMap))
++{
++   if (mCopy) {
++      return CopyInitialize();
++   } else {
++      return PasteInitialize();
++   }
++
++   return true;
++}
++
++bool EffectAutoPunch::CopyInitialize()
++{
++   const WaveTrack* noiseTrack = nullptr;
++   int waveTracks = 0;
++   for (auto t : inputTracks()->Any()) {
++      if (t->GetSelected()) {
++         auto wt = track_cast<const WaveTrack *>(t);
++         if (wt != nullptr) {
++            waveTracks++;
++            noiseTrack = wt;
++         }
++      }
++   }
++
++   if (waveTracks != 1) {
++      Effect::MessageBox(_("You need to select exactly one track with background noise."), wxOK | wxICON_ERROR);
++      return false;
++   }
++
++   wxASSERT(noiseTrack);
++
++   const sampleCount maxNoiseSize = noiseTrack->TimeToLongSamples(MAX_NOISE_DURATION);
++   const sampleCount noiseStart = noiseTrack->TimeToLongSamples(mpSelectedRegion->t0());
++   const sampleCount noiseEnd = noiseTrack->TimeToLongSamples(mpSelectedRegion->t1());
++   sNoiseSize = std::min(maxNoiseSize, noiseEnd - noiseStart);
++
++   sNoise.reinit(1U, sNoiseSize.as_size_t());
++   noiseTrack->Get(
++      (samplePtr) sNoise[0].get(),
++      floatSample,
++      noiseTrack->TimeToLongSamples(mpSelectedRegion->t0()),
++      sNoiseSize.as_size_t()
++   );
++
++   return false;
++}
++
++bool EffectAutoPunch::PasteInitialize()
++{
++   if (!sNoise) {
++      Effect::MessageBox(_("You need to copy background noise first."), wxOK | wxICON_ERROR);
++      return false;
++   }
++
++   mTrackPosition = 0;
++   mSilentRegionIndex = 0;
++
++   int waveTracks = 0;
++   int labelTracks = 0;
++   const LabelTrack* labelTrack = nullptr;
++
++   for (auto t : inputTracks()->Any()) {
++      if (t->GetSelected()) {
++         auto wt = track_cast<const WaveTrack *>(t);
++         auto lt = track_cast<const LabelTrack *>(t);
++         if (wt != nullptr) {
++            waveTracks++;
++            mRate = wt->GetRate();
++         }
++         if (lt != nullptr) {
++            labelTracks++;
++            labelTrack = lt;
++         }
++      }
++   }
++
++   if (waveTracks == 0 || labelTracks != 1) {
++      Effect::MessageBox(_("You need to select:\n- at least one wave track\n- exactly one label track. Label track should be generated with \"Analysis - Sound Finder...\""), wxOK | wxICON_ERROR);
++      return false;
++   }
++
++   const int silentRegionsNum = labelTrack->GetNumLabels();
++   if (silentRegionsNum == 0) {
++      Effect::MessageBox(_("No labels found"), wxOK | wxICON_ERROR);
++      return false;
++   }
++
++   mSilentRegions.reserve(silentRegionsNum);
++   mSilentRegions.push_back(Region(0.0, labelTrack->GetLabel(0)->getT0()));
++   for (int i = 0; i < silentRegionsNum - 1; i++) {
++      mSilentRegions.push_back(Region(
++         std::max(0.0, labelTrack->GetLabel(i)->getT1() - FADE_DURATION),
++         std::max(0.0, labelTrack->GetLabel(i + 1)->getT0())
++      ));
++   }
++
++   return true;
++}
++
++static double lerp(const float s0, const float s1, const double t, const double t0, const double t1)
++{
++    const double time = t - t0;
++    const double maxTime = t1 - t0;
++    const float maxSignal = s1 - s0;
++    return static_cast<float>(time * maxSignal / maxTime + s0);
++}
++
++float fadeIn(const float signal, const double trackTime, const double start, const double end)
++{
++   return lerp(0.0, signal, trackTime, start, end);
++}
++
++float fadeOut(const float signal, const double trackTime, const double start, const double end)
++{
++   return lerp(signal, 0.0, trackTime, start, end);
++}
++
++size_t EffectAutoPunch::ProcessBlock(float **inBlock, float **outBlock, size_t blockLen)
++{
++   wxASSERT(!mCopy);
++   wxASSERT(mRate > 0);
++
++   float *inBuf = inBlock[0];
++   float *outBuf = outBlock[0];
++
++   for (decltype(blockLen) i = 0; i < blockLen; i++)
++   {
++      const double trackTime = mpSelectedRegion->t0() + mTrackPosition.as_double() / mRate;
++      Region silentRegion = mSilentRegions[mSilentRegionIndex];
++      if (trackTime > silentRegion.end && mSilentRegionIndex < mSilentRegions.size() - 1) {
++         mSilentRegionIndex++;
++         silentRegion = mSilentRegions[mSilentRegionIndex];
++      }
++
++      const bool inSilentRegion = trackTime >= silentRegion.start && trackTime <= silentRegion.end;
++      if (inSilentRegion) {
++         float noise = static_cast<float>(sNoise[0][mNoiseIndex]);
++         const bool silenceStarts = trackTime <= silentRegion.start + FADE_DURATION;
++         const bool silenceEnds = trackTime >= silentRegion.end - SOUND_FADEIN_DURATION;
++         if (silenceStarts) {
++            // TODO: configurable fades, independent from bounds? make bound % of fade?
++            // TODO: refactor
++            outBuf[i] = fadeOut(inBuf[i], trackTime, silentRegion.start, silentRegion.start + FADE_DURATION);
++            outBuf[i] += fadeIn(noise, trackTime, silentRegion.start, silentRegion.start + FADE_DURATION);
++         } else if (silenceEnds) {
++            outBuf[i] = fadeIn(inBuf[i], trackTime, silentRegion.end - SOUND_FADEIN_DURATION, silentRegion.end);
++            outBuf[i] += fadeOut(noise, trackTime, silentRegion.end - SOUND_FADEIN_DURATION, silentRegion.end);
++         } else {
++            outBuf[i] = noise;
++         }
++
++         mNoiseIndex = (mNoiseIndex + 1) % sNoiseSize.as_size_t();
++      } else {
++         outBuf[i] = inBuf[i];
++      }
++
++      mTrackPosition++;
++   }
++
++   return blockLen;
++}
+diff --git a/src/effects/AutoPunch.h b/src/effects/AutoPunch.h
+new file mode 100644
+index 000000000..b71ecf8f0
+--- /dev/null
++++ b/src/effects/AutoPunch.h
+@@ -0,0 +1,48 @@
++// Copyright (C) 2019 Alexander Lopatin
++
++#ifndef __AUDACITY_EFFECT_AUTOPUNCH__
++#define __AUDACITY_EFFECT_AUTOPUNCH__
++
++#include <wx/string.h>
++
++#include "Effect.h"
++#include "../WaveTrack.h"
++
++#define AUTOPUNCHCOPY_PLUGIN_SYMBOL ComponentInterfaceSymbol{ XO("AutoPunch Copy") }
++#define AUTOPUNCHPASTE_PLUGIN_SYMBOL ComponentInterfaceSymbol{ XO("AutoPunch Paste") }
++
++class EffectAutoPunch final : public Effect
++{
++public:
++   EffectAutoPunch(bool copy = false);
++   virtual ~EffectAutoPunch();
++
++   ComponentInterfaceSymbol GetSymbol() override;
++   wxString GetDescription() override;
++
++   EffectType GetType() override;
++   bool IsInteractive() override;
++
++   unsigned GetAudioInCount() override;
++   unsigned GetAudioOutCount() override;
++   bool ProcessInitialize(sampleCount totalLen, ChannelNames chanMap = NULL) override;
++   size_t ProcessBlock(float **inBlock, float **outBlock, size_t blockLen) override;
++
++private:
++   bool CopyInitialize();
++   bool PasteInitialize();
++
++   static FloatBuffers sNoise;
++   static sampleCount sNoiseSize;
++
++   bool mCopy;
++   double mRate;
++   size_t mNoiseIndex;
++
++   std::vector<Region> mSilentRegions;
++   size_t mSilentRegionIndex;
++
++   sampleCount mTrackPosition;
++};
++
++#endif
+diff --git a/src/effects/LoadEffects.cpp b/src/effects/LoadEffects.cpp
+index 2a5ab3677..29d299725 100644
+--- a/src/effects/LoadEffects.cpp
++++ b/src/effects/LoadEffects.cpp
+@@ -21,6 +21,7 @@
+ 
+ #include "Amplify.h"
+ #include "AutoDuck.h"
++#include "AutoPunch.h"
+ #include "BassTreble.h"
+ #include "ChangeSpeed.h"
+ #include "ClickRemoval.h"
+@@ -114,6 +115,8 @@
+    EFFECT( SILENCE,           EffectSilence, () )          \
+    EFFECT( TONE,              EffectToneGen, (false) )     \
+    EFFECT( AMPLIFY,           EffectAmplify, () )          \
++   EFFECT( AUTOPUNCHCOPY,     EffectAutoPunch, (true) )   \
++   EFFECT( AUTOPUNCHPASTE,    EffectAutoPunch, (false) )   \
+    EFFECT( BASSTREBLE,        EffectBassTreble, () )       \
+    EFFECT( CHANGESPEED,       EffectChangeSpeed, () )      \
+    EFFECT( CLICKREMOVAL,      EffectClickRemoval, () )     \
