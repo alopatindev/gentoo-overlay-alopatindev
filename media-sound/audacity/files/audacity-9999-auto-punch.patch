@@ -1,15 +1,3 @@
-diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 07b96bb3c..cc0827acf 100644
---- a/src/CMakeLists.txt
-+++ b/src/CMakeLists.txt
-@@ -234,6 +234,7 @@ source_group( commands FILES ${COMMANDS_SOURCE} )
- set( EFFECTS_SOURCE
-    ${CMAKE_SOURCE_DIRECTORY}effects/Amplify.cpp
-    ${CMAKE_SOURCE_DIRECTORY}effects/AutoDuck.cpp
-+   ${CMAKE_SOURCE_DIRECTORY}effects/AutoPunch.cpp
-    ${CMAKE_SOURCE_DIRECTORY}effects/BassTreble.cpp
-    ${CMAKE_SOURCE_DIRECTORY}effects/Biquad.cpp
-    ${CMAKE_SOURCE_DIRECTORY}effects/ChangePitch.cpp
 diff --git a/src/Makefile.am b/src/Makefile.am
 index 75c7691b7..e4db14be2 100644
 --- a/src/Makefile.am
@@ -25,7 +13,7 @@ index 75c7691b7..e4db14be2 100644
  	effects/Biquad.cpp \
 diff --git a/src/effects/AutoPunch.cpp b/src/effects/AutoPunch.cpp
 new file mode 100644
-index 000000000..0b1d4edf0
+index 000000000..01d5d80fb
 --- /dev/null
 +++ b/src/effects/AutoPunch.cpp
 @@ -0,0 +1,221 @@
@@ -42,8 +30,8 @@ index 000000000..0b1d4edf0
 +FloatBuffers EffectAutoPunch::sNoise;
 +sampleCount EffectAutoPunch::sNoiseSize = 0;
 +
-+const double FADE_DURATION = 0.25;
-+const double SOUND_FADEIN_DURATION = FADE_DURATION * 0.05;
++static const double SOUND_FADE_OUT_DURATION = 0.0125;
++static const double SOUND_FADE_IN_DURATION = SOUND_FADE_OUT_DURATION;
 +
 +EffectAutoPunch::EffectAutoPunch(bool copy)
 +   : mCopy(copy)
@@ -180,7 +168,7 @@ index 000000000..0b1d4edf0
 +   mSilentRegions.push_back(Region(0.0, labelTrack->GetLabel(0)->getT0()));
 +   for (int i = 0; i < silentRegionsNum - 1; i++) {
 +      mSilentRegions.push_back(Region(
-+         std::max(0.0, labelTrack->GetLabel(i)->getT1() - FADE_DURATION),
++         std::max(0.0, labelTrack->GetLabel(i)->getT1()),
 +         std::max(0.0, labelTrack->GetLabel(i + 1)->getT0())
 +      ));
 +   }
@@ -226,16 +214,16 @@ index 000000000..0b1d4edf0
 +      const bool inSilentRegion = trackTime >= silentRegion.start && trackTime <= silentRegion.end;
 +      if (inSilentRegion) {
 +         float noise = static_cast<float>(sNoise[0][mNoiseIndex]);
-+         const bool silenceStarts = trackTime <= silentRegion.start + FADE_DURATION;
-+         const bool silenceEnds = trackTime >= silentRegion.end - SOUND_FADEIN_DURATION;
++         const double soundRegionEnd = silentRegion.start + SOUND_FADE_OUT_DURATION;
++         const double soundRegionStart = silentRegion.end - SOUND_FADE_IN_DURATION;
++         const bool silenceStarts = trackTime <= soundRegionEnd;
++         const bool silenceEnds = trackTime >= soundRegionStart;
 +         if (silenceStarts) {
-+            // TODO: configurable fades, independent from bounds? make bound % of fade?
-+            // TODO: refactor
-+            outBuf[i] = fadeOut(inBuf[i], trackTime, silentRegion.start, silentRegion.start + FADE_DURATION);
-+            outBuf[i] += fadeIn(noise, trackTime, silentRegion.start, silentRegion.start + FADE_DURATION);
++            outBuf[i] = fadeOut(inBuf[i], trackTime, silentRegion.start, soundRegionEnd);
++            outBuf[i] += fadeIn(noise, trackTime, silentRegion.start, soundRegionEnd);
 +         } else if (silenceEnds) {
-+            outBuf[i] = fadeIn(inBuf[i], trackTime, silentRegion.end - SOUND_FADEIN_DURATION, silentRegion.end);
-+            outBuf[i] += fadeOut(noise, trackTime, silentRegion.end - SOUND_FADEIN_DURATION, silentRegion.end);
++            outBuf[i] = fadeIn(inBuf[i], trackTime, soundRegionStart, silentRegion.end);
++            outBuf[i] += fadeOut(noise, trackTime, soundRegionStart, silentRegion.end);
 +         } else {
 +            outBuf[i] = noise;
 +         }

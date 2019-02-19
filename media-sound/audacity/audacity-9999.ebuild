@@ -62,10 +62,7 @@ CUSTOMIZATION_PATCHES=(
 
 src_prepare() {
 	use customizations && epatch "${CUSTOMIZATION_PATCHES[@]}"
-
-	# needed because of portmixer patch
 	eautoreconf
-
 	eapply_user
 }
 
@@ -76,8 +73,6 @@ src_configure() {
 	local LIB_PREFERENCE="local system"
 	use system-libs && LIB_PREFERENCE="system local"
 
-	# * always use system libraries if possible
-	# * options listed in the order that configure --help lists them
 	local myeconfargs=(
 		--with-lib-preference="${LIB_PREFERENCE}"
 		#--disable-dynamic-loading
