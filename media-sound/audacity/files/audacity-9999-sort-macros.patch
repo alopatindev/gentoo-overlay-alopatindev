@@ -1,0 +1,13 @@
+diff --git a/src/BatchCommands.cpp b/src/BatchCommands.cpp
+index eac1a57ea..9b4af48cc 100644
+--- a/src/BatchCommands.cpp
++++ b/src/BatchCommands.cpp
+@@ -997,6 +997,8 @@ wxArrayString MacroCommands::GetNames()
+       names.Add(ff.GetName());
+    }
+ 
++   names.Sort();
++
+    return names;
+ }
+ 

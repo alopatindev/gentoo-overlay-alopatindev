@@ -60,6 +60,7 @@ CUSTOMIZATION_PATCHES=(
 	"${FILESDIR}/audacity-9999-auto-punch.patch" # https://forum.audacityteam.org/viewtopic.php?f=39&t=103670
 	"${FILESDIR}/audacity-9999-select-tracks-reversed.patch"
 	"${FILESDIR}/audacity-9999-non-interactive-noise-reduction.patch"
+	"${FILESDIR}/audacity-9999-sort-macros.patch"
 )
 
 src_prepare() {
