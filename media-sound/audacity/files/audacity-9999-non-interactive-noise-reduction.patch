@@ -1,0 +1,131 @@
+diff --git a/src/effects/LoadEffects.cpp b/src/effects/LoadEffects.cpp
+index 2a5ab3677..5d5634b39 100644
+--- a/src/effects/LoadEffects.cpp
++++ b/src/effects/LoadEffects.cpp
+@@ -78,7 +78,9 @@
+ //
+ #if defined(EXPERIMENTAL_NOISE_REDUCTION)
+ #define NOISEREDUCTION_EFFECT \
+-   EFFECT( NOISEREDUCTION, EffectNoiseReduction, () )
++   EFFECT( NOISEREDUCTION, EffectNoiseReduction, (EffectNoiseReduction::MODE_INTERACTIVE) ) \
++   EFFECT( NOISEREDUCTIONCAPTURE, EffectNoiseReduction, (EffectNoiseReduction::MODE_CAPTURE) ) \
++   EFFECT( NOISEREDUCTIONAPPLY, EffectNoiseReduction, (EffectNoiseReduction::MODE_APPLY) )
+ #else
+ #define NOISEREDUCTION_EFFECT \
+    EFFECT( NOISEREMOVAL, EffectNoiseRemoval, () )
+diff --git a/src/effects/NoiseReduction.cpp b/src/effects/NoiseReduction.cpp
+index 96c726a78..6a9e0cdf1 100644
+--- a/src/effects/NoiseReduction.cpp
++++ b/src/effects/NoiseReduction.cpp
+@@ -71,6 +71,9 @@
+ // [Discussed and agreed for v2.1 by Steve, Paul, Bill].
+ #undef EXPERIMENTAL_SPECTRAL_EDITING
+ 
++std::unique_ptr<EffectNoiseReduction::Settings> EffectNoiseReduction::mSettings(nullptr);
++std::unique_ptr<EffectNoiseReduction::Statistics> EffectNoiseReduction::mStatistics(nullptr);
++
+ typedef std::vector<float> FloatVector;
+ 
+ // Define both of these to make the radio button three-way
+@@ -417,9 +420,13 @@ private:
+     DECLARE_EVENT_TABLE()
+ };
+ 
+-EffectNoiseReduction::EffectNoiseReduction()
+-: mSettings(std::make_unique<EffectNoiseReduction::Settings>())
++EffectNoiseReduction::EffectNoiseReduction(Mode mode)
++: mMode(mode)
+ {
++   if (!mSettings) {
++      mSettings = std::make_unique<EffectNoiseReduction::Settings>();
++   }
++
+    Init();
+ }
+ 
+@@ -431,7 +438,17 @@ EffectNoiseReduction::~EffectNoiseReduction()
+ 
+ ComponentInterfaceSymbol EffectNoiseReduction::GetSymbol()
+ {
+-   return NOISEREDUCTION_PLUGIN_SYMBOL;
++   switch (mMode) {
++   case MODE_INTERACTIVE:
++      return NOISEREDUCTION_PLUGIN_SYMBOL;
++   case MODE_CAPTURE:
++      return NOISEREDUCTIONCAPTURE_PLUGIN_SYMBOL;
++   case MODE_APPLY:
++      return NOISEREDUCTIONAPPLY_PLUGIN_SYMBOL;
++   default:
++      wxASSERT(false);
++      return NOISEREDUCTION_PLUGIN_SYMBOL;
++   }
+ }
+ 
+ wxString EffectNoiseReduction::GetDescription()
+@@ -469,17 +486,22 @@ bool EffectNoiseReduction::Settings::PromptUser
+ (EffectNoiseReduction *effect, wxWindow *parent,
+  bool bHasProfile, bool bAllowTwiddleSettings)
+ {
+-   EffectNoiseReduction::Dialog dlog
+-      (effect, this, parent, bHasProfile, bAllowTwiddleSettings);
++   if (effect->mMode == MODE_INTERACTIVE) {
++      EffectNoiseReduction::Dialog dlog
++         (effect, this, parent, bHasProfile, bAllowTwiddleSettings);
+ 
+-   dlog.CentreOnParent();
+-   dlog.ShowModal();
++      dlog.CentreOnParent();
++      dlog.ShowModal();
+ 
+-   if (dlog.GetReturnCode() == 0)
+-      return false;
++      if (dlog.GetReturnCode() == 0)
++         return false;
+ 
+-   *this = dlog.GetTempSettings();
+-   mDoProfile = (dlog.GetReturnCode() == 1);
++      *this = dlog.GetTempSettings();
++
++      mDoProfile = (dlog.GetReturnCode() == 1);
++   } else {
++      *this = *effect->mSettings.get();
++   }
+ 
+    return PrefsIO(false);
+ }
+diff --git a/src/effects/NoiseReduction.h b/src/effects/NoiseReduction.h
+index b87e3c1d9..a2f90e15f 100644
+--- a/src/effects/NoiseReduction.h
++++ b/src/effects/NoiseReduction.h
+@@ -18,11 +18,18 @@
+ #include "../MemoryX.h"
+ 
+ #define NOISEREDUCTION_PLUGIN_SYMBOL ComponentInterfaceSymbol{ XO("Noise Reduction") }
++#define NOISEREDUCTIONAPPLY_PLUGIN_SYMBOL ComponentInterfaceSymbol{ XO("Noise Reduction: Apply") }
++#define NOISEREDUCTIONCAPTURE_PLUGIN_SYMBOL ComponentInterfaceSymbol{ XO("Noise Reduction: Capture Noise") }
+ 
+ class EffectNoiseReduction final : public Effect {
+ public:
++   enum Mode {
++      MODE_INTERACTIVE,
++      MODE_CAPTURE,
++      MODE_APPLY
++   };
+ 
+-   EffectNoiseReduction();
++   EffectNoiseReduction(Mode mode);
+    virtual ~EffectNoiseReduction();
+ 
+    using Effect::TrackProgress;
+@@ -54,8 +61,9 @@ private:
+    class Worker;
+    friend class Dialog;
+ 
+-   std::unique_ptr<Settings> mSettings;
+-   std::unique_ptr<Statistics> mStatistics;
++   Mode mMode;
++   static std::unique_ptr<Settings> mSettings;
++   static std::unique_ptr<Statistics> mStatistics;
+ };
+ 
+ #endif
