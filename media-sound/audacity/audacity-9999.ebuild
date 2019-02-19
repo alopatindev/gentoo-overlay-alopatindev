@@ -61,6 +61,7 @@ CUSTOMIZATION_PATCHES=(
 	"${FILESDIR}/audacity-9999-select-tracks-reversed.patch"
 	"${FILESDIR}/audacity-9999-non-interactive-noise-reduction.patch"
 	"${FILESDIR}/audacity-9999-sort-macros.patch"
+	"${FILESDIR}/audacity-9999-disable-default-macros.patch"
 )
 
 src_prepare() {

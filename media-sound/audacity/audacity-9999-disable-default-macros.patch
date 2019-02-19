@@ -1,0 +1,23 @@
+diff --git a/src/BatchCommands.cpp b/src/BatchCommands.cpp
+index eac1a57ea..f15191f9b 100644
+--- a/src/BatchCommands.cpp
++++ b/src/BatchCommands.cpp
+@@ -92,18 +92,6 @@ MacroCommands::MacroCommands()
+ {
+    mMessage = "";
+    ResetMacro();
+-
+-   wxArrayString names = GetNames();
+-   wxArrayString defaults = GetNamesOfDefaultMacros();
+-
+-   for( size_t i = 0;i<defaults.Count();i++){
+-      wxString name = defaults[i];
+-      if (names.Index(name) == wxNOT_FOUND) {
+-         AddMacro(name);
+-         RestoreMacro(name);
+-         WriteMacro(name);
+-      }
+-   }
+ }
+ 
+ static const wxString MP3Conversion = XO("MP3 Conversion");
