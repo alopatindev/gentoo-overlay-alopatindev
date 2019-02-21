@@ -7,9 +7,9 @@ index 2a5ab3677..5d5634b39 100644
  #if defined(EXPERIMENTAL_NOISE_REDUCTION)
  #define NOISEREDUCTION_EFFECT \
 -   EFFECT( NOISEREDUCTION, EffectNoiseReduction, () )
-+   EFFECT( NOISEREDUCTION, EffectNoiseReduction, (EffectNoiseReduction::MODE_INTERACTIVE) ) \
-+   EFFECT( NOISEREDUCTIONCAPTURE, EffectNoiseReduction, (EffectNoiseReduction::MODE_CAPTURE) ) \
-+   EFFECT( NOISEREDUCTIONAPPLY, EffectNoiseReduction, (EffectNoiseReduction::MODE_APPLY) )
++   EFFECT( NOISEREDUCTION, EffectNoiseReduction, (EffectNoiseReduction::Mode::Interactive) ) \
++   EFFECT( NOISEREDUCTIONCAPTURE, EffectNoiseReduction, (EffectNoiseReduction::Mode::Capture) ) \
++   EFFECT( NOISEREDUCTIONAPPLY, EffectNoiseReduction, (EffectNoiseReduction::Mode::Apply) )
  #else
  #define NOISEREDUCTION_EFFECT \
     EFFECT( NOISEREMOVAL, EffectNoiseRemoval, () )
@@ -49,11 +49,11 @@ index 96c726a78..6a9e0cdf1 100644
  {
 -   return NOISEREDUCTION_PLUGIN_SYMBOL;
 +   switch (mMode) {
-+   case MODE_INTERACTIVE:
++   case Interactive:
 +      return NOISEREDUCTION_PLUGIN_SYMBOL;
-+   case MODE_CAPTURE:
++   case Capture:
 +      return NOISEREDUCTIONCAPTURE_PLUGIN_SYMBOL;
-+   case MODE_APPLY:
++   case Apply:
 +      return NOISEREDUCTIONAPPLY_PLUGIN_SYMBOL;
 +   default:
 +      wxASSERT(false);
@@ -68,7 +68,7 @@ index 96c726a78..6a9e0cdf1 100644
  {
 -   EffectNoiseReduction::Dialog dlog
 -      (effect, this, parent, bHasProfile, bAllowTwiddleSettings);
-+   if (effect->mMode == MODE_INTERACTIVE) {
++   if (effect->mMode == Interactive) {
 +      EffectNoiseReduction::Dialog dlog
 +         (effect, this, parent, bHasProfile, bAllowTwiddleSettings);
  
@@ -107,9 +107,9 @@ index b87e3c1d9..a2f90e15f 100644
  class EffectNoiseReduction final : public Effect {
  public:
 +   enum Mode {
-+      MODE_INTERACTIVE,
-+      MODE_CAPTURE,
-+      MODE_APPLY
++      Interactive,
++      Capture,
++      Apply
 +   };
  
 -   EffectNoiseReduction();
