@@ -62,6 +62,7 @@ CUSTOMIZATION_PATCHES=(
 	"${FILESDIR}/audacity-9999-non-interactive-noise-reduction.patch"
 	"${FILESDIR}/audacity-9999-sort-macros.patch"
 	"${FILESDIR}/audacity-9999-disable-default-macros.patch"
+	"${FILESDIR}/audacity-9999-snd-avg-workaround.patch" # possible workaround https://forum.audacityteam.org/viewtopic.php?f=39&t=75738#p228219
 )
 
 src_prepare() {
