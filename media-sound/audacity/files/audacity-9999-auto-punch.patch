@@ -13,10 +13,10 @@ index 75c7691b7..e4db14be2 100644
  	effects/Biquad.cpp \
 diff --git a/src/effects/AutoPunch.cpp b/src/effects/AutoPunch.cpp
 new file mode 100644
-index 000000000..01d5d80fb
+index 000000000..7ca8c0cbb
 --- /dev/null
 +++ b/src/effects/AutoPunch.cpp
-@@ -0,0 +1,221 @@
+@@ -0,0 +1,280 @@
 +// Copyright (C) 2019 Alexander Lopatin
 +
 +#include "../Audacity.h"
@@ -33,8 +33,8 @@ index 000000000..01d5d80fb
 +static const double SOUND_FADE_OUT_DURATION = 0.0125;
 +static const double SOUND_FADE_IN_DURATION = SOUND_FADE_OUT_DURATION;
 +
-+EffectAutoPunch::EffectAutoPunch(bool copy)
-+   : mCopy(copy)
++EffectAutoPunch::EffectAutoPunch(Mode mode)
++   : mMode(mode)
 +   , mRate(0)
 +   , mNoiseIndex(0)
 +   , mSilentRegionIndex(0)
@@ -48,12 +48,32 @@ index 000000000..01d5d80fb
 +
 +ComponentInterfaceSymbol EffectAutoPunch::GetSymbol()
 +{
-+   return mCopy ? AUTOPUNCHCOPY_PLUGIN_SYMBOL : AUTOPUNCHPASTE_PLUGIN_SYMBOL;
++   switch (mMode) {
++   case Copy:
++      return AUTOPUNCHCOPY_PLUGIN_SYMBOL;
++   case Paste:
++      return AUTOPUNCHPASTE_PLUGIN_SYMBOL;
++   case Apply:
++      return AUTOPUNCHAPPLY_PLUGIN_SYMBOL;
++   default:
++      wxASSERT(false);
++      return AUTOPUNCHAPPLY_PLUGIN_SYMBOL;
++   }
 +}
 +
 +wxString EffectAutoPunch::GetDescription()
 +{
-+   return mCopy ? _("Copy background noise") : _("Paste noise to silent places");
++   switch (mMode) {
++   case Copy:
++      return _("Copy background noise");
++   case Paste:
++      return _("Paste noise to selection");
++   case Apply:
++      return _("Paste noise to silent places");
++   default:
++      wxASSERT(false);
++      return _("");
++   }
 +}
 +
 +EffectType EffectAutoPunch::GetType()
@@ -78,10 +98,16 @@ index 000000000..01d5d80fb
 +
 +bool EffectAutoPunch::ProcessInitialize(sampleCount WXUNUSED(totalLen), ChannelNames WXUNUSED(chanMap))
 +{
-+   if (mCopy) {
++   switch (mMode) {
++   case Copy:
 +      return CopyInitialize();
-+   } else {
++   case Paste:
 +      return PasteInitialize();
++   case Apply:
++      return ApplyInitialize();
++   default:
++      wxASSERT(false);
++      return false;
 +   }
 +
 +   return true;
@@ -135,6 +161,38 @@ index 000000000..01d5d80fb
 +   mSilentRegionIndex = 0;
 +
 +   int waveTracks = 0;
++   for (auto t : inputTracks()->Any()) {
++      if (t->GetSelected()) {
++         auto wt = track_cast<const WaveTrack *>(t);
++         if (wt != nullptr) {
++            waveTracks++;
++            mRate = wt->GetRate();
++         }
++      }
++   }
++
++   if (waveTracks == 0) {
++      Effect::MessageBox(_("You need to select at least one wave track."), wxOK | wxICON_ERROR);
++      return false;
++   }
++
++   mSilentRegions.clear();
++   mSilentRegions.push_back(Region(mpSelectedRegion->t0(), mpSelectedRegion->t1()));
++
++   return true;
++}
++
++bool EffectAutoPunch::ApplyInitialize()
++{
++   if (!sNoise) {
++      Effect::MessageBox(_("You need to copy background noise first."), wxOK | wxICON_ERROR);
++      return false;
++   }
++
++   mTrackPosition = 0;
++   mSilentRegionIndex = 0;
++
++   int waveTracks = 0;
 +   int labelTracks = 0;
 +   const LabelTrack* labelTrack = nullptr;
 +
@@ -164,6 +222,7 @@ index 000000000..01d5d80fb
 +      return false;
 +   }
 +
++   mSilentRegions.clear();
 +   mSilentRegions.reserve(silentRegionsNum);
 +   mSilentRegions.push_back(Region(0.0, labelTrack->GetLabel(0)->getT0()));
 +   for (int i = 0; i < silentRegionsNum - 1; i++) {
@@ -196,7 +255,7 @@ index 000000000..01d5d80fb
 +
 +size_t EffectAutoPunch::ProcessBlock(float **inBlock, float **outBlock, size_t blockLen)
 +{
-+   wxASSERT(!mCopy);
++   wxASSERT(mMode != Copy);
 +   wxASSERT(mRate > 0);
 +
 +   float *inBuf = inBlock[0];
@@ -240,10 +299,10 @@ index 000000000..01d5d80fb
 +}
 diff --git a/src/effects/AutoPunch.h b/src/effects/AutoPunch.h
 new file mode 100644
-index 000000000..b71ecf8f0
+index 000000000..5b55f0831
 --- /dev/null
 +++ b/src/effects/AutoPunch.h
-@@ -0,0 +1,48 @@
+@@ -0,0 +1,56 @@
 +// Copyright (C) 2019 Alexander Lopatin
 +
 +#ifndef __AUDACITY_EFFECT_AUTOPUNCH__
@@ -256,11 +315,18 @@ index 000000000..b71ecf8f0
 +
 +#define AUTOPUNCHCOPY_PLUGIN_SYMBOL ComponentInterfaceSymbol{ XO("AutoPunch Copy") }
 +#define AUTOPUNCHPASTE_PLUGIN_SYMBOL ComponentInterfaceSymbol{ XO("AutoPunch Paste") }
++#define AUTOPUNCHAPPLY_PLUGIN_SYMBOL ComponentInterfaceSymbol{ XO("AutoPunch Apply") }
 +
 +class EffectAutoPunch final : public Effect
 +{
 +public:
-+   EffectAutoPunch(bool copy = false);
++   enum Mode {
++      Copy,
++      Paste,
++      Apply
++   };
++
++   EffectAutoPunch(Mode mode);
 +   virtual ~EffectAutoPunch();
 +
 +   ComponentInterfaceSymbol GetSymbol() override;
@@ -277,11 +343,12 @@ index 000000000..b71ecf8f0
 +private:
 +   bool CopyInitialize();
 +   bool PasteInitialize();
++   bool ApplyInitialize();
 +
 +   static FloatBuffers sNoise;
 +   static sampleCount sNoiseSize;
 +
-+   bool mCopy;
++   Mode mMode;
 +   double mRate;
 +   size_t mNoiseIndex;
 +
@@ -293,7 +360,7 @@ index 000000000..b71ecf8f0
 +
 +#endif
 diff --git a/src/effects/LoadEffects.cpp b/src/effects/LoadEffects.cpp
-index 2a5ab3677..29d299725 100644
+index 2a5ab3677..89420724d 100644
 --- a/src/effects/LoadEffects.cpp
 +++ b/src/effects/LoadEffects.cpp
 @@ -21,6 +21,7 @@
@@ -304,12 +371,13 @@ index 2a5ab3677..29d299725 100644
  #include "BassTreble.h"
  #include "ChangeSpeed.h"
  #include "ClickRemoval.h"
-@@ -114,6 +115,8 @@
+@@ -114,6 +115,9 @@
     EFFECT( SILENCE,           EffectSilence, () )          \
     EFFECT( TONE,              EffectToneGen, (false) )     \
     EFFECT( AMPLIFY,           EffectAmplify, () )          \
-+   EFFECT( AUTOPUNCHCOPY,     EffectAutoPunch, (true) )   \
-+   EFFECT( AUTOPUNCHPASTE,    EffectAutoPunch, (false) )   \
++   EFFECT( AUTOPUNCHCOPY,     EffectAutoPunch, (EffectAutoPunch::Mode::Copy) ) \
++   EFFECT( AUTOPUNCHPASTE,    EffectAutoPunch, (EffectAutoPunch::Mode::Paste) ) \
++   EFFECT( AUTOPUNCHAPPLY,    EffectAutoPunch, (EffectAutoPunch::Mode::Apply) ) \
     EFFECT( BASSTREBLE,        EffectBassTreble, () )       \
     EFFECT( CHANGESPEED,       EffectChangeSpeed, () )      \
     EFFECT( CLICKREMOVAL,      EffectClickRemoval, () )     \
