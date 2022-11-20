@@ -9,7 +9,7 @@
 		<email>alopatindev.spamhere@gmail.com</email>
 		<name>alopatindev</name>
     </owner>
-    <source type="git">git://github.com/alopatindev/gentoo-overlay-alopatindev.git</source>
+    <source type="git">https://github.com/alopatindev/gentoo-overlay-alopatindev</source>
     <feed>https://github.com/alopatindev/gentoo-overlay-alopatindev/commits/master.atom</feed>
   </repo>
 </repositories>
