@@ -1,1 +1,0 @@
-layman -f -o https://raw.github.com/alopatindev/gentoo-overlay-alopatindev/master/repository.xml -a alopatindev-overlay
