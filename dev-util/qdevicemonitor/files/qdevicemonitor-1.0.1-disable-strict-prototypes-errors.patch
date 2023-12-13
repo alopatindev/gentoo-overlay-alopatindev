@@ -1,7 +1,7 @@
-From 1dca4862812db781ea3803c4c9746cbe8416be21 Mon Sep 17 00:00:00 2001
+From ae3e25746222a2a44e2e06bdace8feee66cfa998 Mon Sep 17 00:00:00 2001
 From: Alexander Lopatin <alopatindev@gmail.com>
 Date: Wed, 13 Dec 2023 19:16:54 +0800
-Subject: [PATCH] Disable no-strict-prototypes errors
+Subject: [PATCH] Disable strict-prototypes errors
  https://bugs.gentoo.org/919714
 
 ---
