@@ -1,0 +1,26 @@
+From 1dca4862812db781ea3803c4c9746cbe8416be21 Mon Sep 17 00:00:00 2001
+From: Alexander Lopatin <alopatindev@gmail.com>
+Date: Wed, 13 Dec 2023 19:16:54 +0800
+Subject: [PATCH] Disable no-strict-prototypes errors
+ https://bugs.gentoo.org/919714
+
+---
+ qdevicemonitor/qdevicemonitor.pro | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qdevicemonitor/qdevicemonitor.pro b/qdevicemonitor/qdevicemonitor.pro
+index 6aa2ecf..18a74b4 100644
+--- a/qdevicemonitor/qdevicemonitor.pro
++++ b/qdevicemonitor/qdevicemonitor.pro
+@@ -65,7 +65,7 @@ QMAKE_CXXFLAGS += -pedantic-errors -pedantic -Wextra -Wall
+ QMAKE_CXXFLAGS_RELEASE -= -O2
+ QMAKE_CXXFLAGS_RELEASE += -O3
+ 
+-QMAKE_CFLAGS += -pedantic-errors -pedantic -Wextra -Wall -std=c11
++QMAKE_CFLAGS += -pedantic-errors -pedantic -Wextra -Wall -Wno-strict-prototypes -std=c11
+ QMAKE_CFLAGS_RELEASE -= -O2
+ QMAKE_CFLAGS_RELEASE += -O3
+ 
+-- 
+2.41.0
+
