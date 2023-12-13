@@ -34,7 +34,7 @@ PATCHES=(
 	"${FILESDIR}"/${P}-screen-geometry-is-deprecated.patch
 	"${FILESDIR}"/${P}-endl-is-deprecated.patch
 	"${FILESDIR}"/${P}-disable-warnings-as-errors.patch
-	"${FILESDIR}"/${P}-disable-strict-prototypes-errors.patch
+	"${FILESDIR}"/${P}-disable-pedantic-errors.patch
 )
 
 src_configure() {
