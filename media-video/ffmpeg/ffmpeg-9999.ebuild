@@ -524,7 +524,7 @@ multilib_src_configure() {
 		--strip="$(tc-getSTRIP)" \
 		--ranlib="$(tc-getRANLIB)" \
 		--pkg-config="$(tc-getPKG_CONFIG)" \
-		--optflags="${CFLAGS}" \
+		--optflags="-I/usr/include/drm ${CFLAGS}" \
 		$(use_enable static-libs static) \
 		"${myconf[@]}" \
 		${EXTRA_FFMPEG_CONF}
