@@ -1,0 +1,36 @@
+diff --git a/core/rtw_chplan.c b/core/rtw_chplan.c
+index 82b3671..f374ac6 100644
+--- a/core/rtw_chplan.c
++++ b/core/rtw_chplan.c
+@@ -125,8 +125,9 @@ static const struct ch_list_t rtw_channel_def_2g[] = {
+ #if CONFIG_IEEE80211_BAND_5GHZ
+ static const struct ch_list_t rtw_channel_def_5g[] = {
+ 	/* 0, RTW_CHD_5G_00 */	CH_LIST_ENT(0, 0),
+-	/* 1, RTW_CHD_5G_01 */	CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165, CLA_5G_B2_DFS | CLA_5G_B3_DFS),
+-	/* 2, RTW_CHD_5G_02 */	CH_LIST_ENT(19, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, CLA_5G_B2_DFS | CLA_5G_B3_DFS),
++	/* 1, RTW_CHD_5G_01 */	CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165, CLA_5G_B2_DFS | CLA_5G_B3_DFS), /* US */
++	/* 2, RTW_CHD_5G_01 */	/*CH_LIST_ENT(28, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 149, 153, 157, 161, 165, 169, 173, 177, 0),*/ // wildcard
++	/* 2, RTW_CHD_5G_01 */	CH_LIST_ENT(13, 36, 40, 44, 48, 52, 56, 60, 64, 68, 149, 153, 157, 161, 0), // for Indonesia
+ 	/* 3, RTW_CHD_5G_03 */	CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165, CLA_5G_B2_DFS | CLA_5G_B3_DFS),
+ 	/* 4, RTW_CHD_5G_04 */	CH_LIST_ENT(22, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 149, 153, 157, 161, 165, CLA_5G_B2_DFS | CLA_5G_B3_DFS),
+ 	/* 5, RTW_CHD_5G_05 */	CH_LIST_ENT(19, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 149, 153, 157, 161, CLA_5G_B2_DFS | CLA_5G_B3_DFS),
+@@ -139,7 +140,7 @@ static const struct ch_list_t rtw_channel_def_5g[] = {
+ 	/* 12, RTW_CHD_5G_12 */	CH_LIST_ENT(16, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165, CLA_5G_B2_DFS | CLA_5G_B3_DFS),
+ 	/* 13, RTW_CHD_5G_13 */	CH_LIST_ENT(8, 56, 60, 64, 149, 153, 157, 161, 165, CLA_5G_B2_DFS),
+ 	/* 14, RTW_CHD_5G_14 */	CH_LIST_ENT(4, 36, 40, 44, 48, 0),
+-	/* 15, RTW_CHD_5G_15 */	CH_LIST_ENT(4, 149, 153, 157, 161, 0),
++	/* 15, RTW_CHD_5G_15 */	CH_LIST_ENT(13, 36, 40, 44, 48, 52, 56, 60, 64, 68, 149, 153, 157, 161, 0), // Indonesia?
+ 	/* 16, RTW_CHD_5G_16 */	CH_LIST_ENT(11, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 0),
+ 	/* 17, RTW_CHD_5G_17 */	CH_LIST_ENT(16, 36, 40, 44, 48, 52, 56, 60, 64, 132, 136, 140, 149, 153, 157, 161, 165, CLA_5G_B2_DFS | CLA_5G_B3_DFS),
+ 	/* 18, RTW_CHD_5G_18 */	CH_LIST_ENT(17, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165, CLA_5G_B2_DFS | CLA_5G_B3_DFS),
+@@ -460,8 +461,10 @@ static u8 init_channel_set_from_rtk_priv(_adapter *padapter, RT_CHANNEL_INFO *ch
+ 
+ 		attrib = CH_LIST_ATTRIB(rtw_channel_def_5g[chd_5g]);
+ 
++        RTW_PRINT("initializing channels for chd_5g=%u\n", chd_5g);
+ 		for (index = 0; index < CH_LIST_LEN(rtw_channel_def_5g[chd_5g]); index++) {
+ 			ch = CH_LIST_CH(rtw_channel_def_5g[chd_5g], index);
++		    RTW_PRINT("channel ch=%u\n", ch);
+ 			if (rtw_regsty_is_excl_chs(regsty, ch) == _TRUE)
+ 				continue;
+ 			dfs = (rtw_is_5g_band2(ch) && (attrib & CLA_5G_B2_DFS))
