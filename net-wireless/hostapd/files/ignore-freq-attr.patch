@@ -1,0 +1,21 @@
+diff -Naur hostapd-2.10.orig/src/drivers/driver_nl80211_capa.c hostapd-2.10/src/drivers/driver_nl80211_capa.c
+--- hostapd-2.10.orig/src/drivers/driver_nl80211_capa.c	2022-01-17 04:51:29.000000000 +0800
++++ hostapd-2.10/src/drivers/driver_nl80211_capa.c	2024-02-11 18:02:02.811895988 +0800
+@@ -1556,7 +1556,7 @@
+ 			   "nl80211: No channel number found for frequency %u MHz",
+ 			   chan->freq);
+ 
+-	if (tb_freq[NL80211_FREQUENCY_ATTR_DISABLED])
++	/*if (tb_freq[NL80211_FREQUENCY_ATTR_DISABLED])
+ 		chan->flag |= HOSTAPD_CHAN_DISABLED;
+ 	if (tb_freq[NL80211_FREQUENCY_ATTR_NO_IR])
+ 		chan->flag |= HOSTAPD_CHAN_NO_IR;
+@@ -1600,7 +1600,7 @@
+ 	if (tb_freq[NL80211_FREQUENCY_ATTR_DFS_CAC_TIME]) {
+ 		chan->dfs_cac_ms = nla_get_u32(
+ 			tb_freq[NL80211_FREQUENCY_ATTR_DFS_CAC_TIME]);
+-	}
++	}*/
+ 
+ 	chan->wmm_rules_valid = 0;
+ 	if (tb_freq[NL80211_FREQUENCY_ATTR_WMM]) {
