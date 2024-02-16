@@ -4,12 +4,11 @@
 EAPI=8
 DIST_VERSION="0.1.0-beta.5"
 
-inherit cargo ninja-utils meson
+inherit cargo gnome2-utils meson ninja-utils xdg-utils
 
 DESCRIPTION="Chat over Telegram on a modern and elegant client"
 HOMEPAGE="https://github.com/paper-plane-developers/paper-plane"
 
-# NOTE: cd /var/tmp/portage/net-im/paper-plane-*/work && cargo tree --charset ascii | grep -v '\(https://' | sed 's!\[.*\]!!g;s![|`]!!g;s!--!!g;s! v\([0-9]\)!-\1!;s!(.*)!!;s/ *//g' | sort -u
 CRATES="adler-1.0.2
 	aho-corasick-1.1.2
 	anyhow-1.0.75
@@ -219,5 +218,12 @@ src_install() {
 }
 
 pkg_postinst() {
+	xdg_icon_cache_update
+	gnome2_schemas_update
 	ewarn "Never distribute the binary of this package, it contains your application credentials, which are forbidden to pass to third parties."
+}
+
+pkg_postrm() {
+	xdg_icon_cache_update
+	gnome2_schemas_update
 }
