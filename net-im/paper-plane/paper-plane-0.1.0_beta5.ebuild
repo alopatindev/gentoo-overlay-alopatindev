@@ -173,12 +173,9 @@ RDEPEND="${DEPEND}"
 BDEPEND="
 	dev-build/meson
 	dev-build/ninja
-	|| (
-		dev-lang/rust
-		dev-lang/rust-bin
-	)
 	=dev-libs/tdlib-1.8.19
-	dev-util/blueprint-compiler"
+	dev-util/blueprint-compiler
+	virtual/rust"
 
 S="${WORKDIR}"
 BUILD_DIR="${WORKDIR}/${P}-build"
