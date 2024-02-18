@@ -183,14 +183,14 @@ BUILD_DIR="${WORKDIR}/${P}-build"
 src_configure() {
 	cargo_src_configure
 
-	if [ -z "${TG_API_ID}" ] || [ -z "${TG_API_HASH}" ] ; then
+	if [ -z "${MY_TDESKTOP_API_ID}" ] || [ -z "${MY_TDESKTOP_API_HASH}" ] ; then
 		ewarn "Create API credentials at https://my.telegram.org/ -> API development tools"
 		ewarn "Apply the credentials:"
 		ewarn "  mkdir -p /etc/portage/env /etc/portage/package.env"
-		ewarn "  echo 'TG_API_ID=\"<your App api_id>\"' > /etc/portage/env/paper-plane.conf"
-		ewarn "  echo 'TG_API_HASH=\"<your App api_hash>\"' >> /etc/portage/env/paper-plane.conf"
-		ewarn "  chmod og-r /etc/portage/env/paper-plane.conf"
-		ewarn "  echo 'net-im/paper-plane paper-plane.conf' > /etc/portage/package.env/paper-plane"
+		ewarn "  echo 'MY_TDESKTOP_API_ID=\"<your App api_id>\"' > /etc/portage/env/telegram.conf"
+		ewarn "  echo 'MY_TDESKTOP_API_HASH=\"<your App api_hash>\"' >> /etc/portage/env/telegram.conf"
+		ewarn "  chmod og-r /etc/portage/env/telegram.conf"
+		ewarn "  echo 'net-im/paper-plane telegram.conf' > /etc/portage/package.env/telegram"
 		ewarn "And click 'Save changes'"
 		ewarn
 		ewarn "More info: https://github.com/paper-plane-developers/paper-plane/tree/v${DIST_VERSION}#installation-instructions"
@@ -198,8 +198,8 @@ src_configure() {
 	fi
 
 	local emesonargs=(
-		-Dtg_api_id="${TG_API_ID}"
-		-Dtg_api_hash="${TG_API_HASH}"
+		-Dtg_api_id="${MY_TDESKTOP_API_ID}"
+		-Dtg_api_hash="${MY_TDESKTOP_API_HASH}"
 	)
 	meson_src_configure
 }
