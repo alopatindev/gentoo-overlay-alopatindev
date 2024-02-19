@@ -103,6 +103,7 @@ PATCHES=(
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_hide-sponsored-messages/0000-data_data_sponsored_messages.cpp.patch"
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_chat-ids/chat_ids.patch"
 	"${FILESDIR}/patches/0/0000_disable_saving_restrictions.patch"
+	"${FILESDIR}/patches/0/enable-all-chats-reordering.patch"
 )
 
 pkg_pretend() {

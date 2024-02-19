@@ -67,6 +67,21 @@ index 2f1dabe..bd6d25f 100644
  }
  
  bool HistoryInner::showCopyRestriction(HistoryItem *item) {
+@@ -2702,14 +2702,6 @@ bool HistoryInner::showCopyRestriction(HistoryItem *item) {
+ }
+ 
+ bool HistoryInner::hasCopyRestrictionForSelected() const {
+-	if (hasCopyRestriction()) {
+-		return true;
+-	}
+-	for (const auto &[item, selection] : _selected) {
+-		if (item && item->forbidsForward()) {
+-			return true;
+-		}
+-	}
+ 	return false;
+ }
+ 
 diff --git a/Telegram/SourceFiles/history/history_item.cpp b/Telegram/SourceFiles/history/history_item.cpp
 index 55e1def..745338c 100644
 --- a/Telegram/SourceFiles/history/history_item.cpp
