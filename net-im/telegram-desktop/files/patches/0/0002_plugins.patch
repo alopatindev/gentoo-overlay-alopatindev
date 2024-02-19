@@ -1,0 +1,18 @@
+diff --git a/Telegram/SourceFiles/core/launcher.cpp b/Telegram/SourceFiles/core/launcher.cpp
+index 25473426f..bb4c7d425 100644
+--- a/Telegram/SourceFiles/core/launcher.cpp
++++ b/Telegram/SourceFiles/core/launcher.cpp
+@@ -330,6 +330,13 @@ int Launcher::exec() {
+ 
+ 	// Must be started before Sandbox is created.
+ 	Platform::start();
++
++#if defined(Q_OS_LINUX64)
++	QCoreApplication::addLibraryPath("/usr/lib64/qt5/plugins");
++#else
++	QCoreApplication::addLibraryPath("/usr/lib/qt5/plugins");
++#endif
++
+ 	auto result = executeApplication();
+ 
+ 	DEBUG_LOG(("Telegram finished, result: %1").arg(result));
