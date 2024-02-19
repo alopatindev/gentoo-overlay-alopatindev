@@ -1,8 +1,6 @@
 # Copyright 2020-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-# TODO: sandox
-
 EAPI=8
 
 PYTHON_COMPAT=( python3_{10..12} )
@@ -165,7 +163,6 @@ src_configure() {
 	# the same state across both projects.
 	# See https://bugs.gentoo.org/866055
 	append-cppflags '-DNDEBUG'
-	replace-flags "-O2" "-O3"
 
 	local qt=$(usex qt6 6 5)
 	local mycmakeargs=(
