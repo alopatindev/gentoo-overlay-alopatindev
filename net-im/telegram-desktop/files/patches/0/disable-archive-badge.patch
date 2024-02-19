@@ -1,0 +1,13 @@
+diff --git a/Telegram/SourceFiles/window/window_main_menu.cpp b/Telegram/SourceFiles/window/window_main_menu.cpp
+index 051a99d..25c55ec 100644
+--- a/Telegram/SourceFiles/window/window_main_menu.cpp
++++ b/Telegram/SourceFiles/window/window_main_menu.cpp
+@@ -763,7 +763,7 @@ void MainMenu::setupArchive() {
+ 		const auto state = loaded
+ 			? loaded->chatListBadgesState()
+ 			: Dialogs::BadgesState();
+-		return Badge::UnreadBadge{ state.unreadCounter, true };
++		return Badge::UnreadBadge{ 0, true };
+ 	}));
+ 
+ 	rpl::merge(

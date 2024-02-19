@@ -1,0 +1,13 @@
+diff --git a/Telegram/SourceFiles/window/window_filters_menu.cpp b/Telegram/SourceFiles/window/window_filters_menu.cpp
+index 88a940f..ed03ec1 100644
+--- a/Telegram/SourceFiles/window/window_filters_menu.cpp
++++ b/Telegram/SourceFiles/window/window_filters_menu.cpp
+@@ -300,7 +300,7 @@ base::unique_qptr<Ui::SideBarButton> FiltersMenu::prepareButton(
+ 			&_session->session(),
+ 			id
+ 		) | rpl::start_with_next([=](const Dialogs::UnreadState &state) {
+-			const auto count = (state.chats + state.marks);
++			const auto count = 0;
+ 			const auto muted = (state.chatsMuted + state.marksMuted);
+ 			const auto string = !count
+ 				? QString()

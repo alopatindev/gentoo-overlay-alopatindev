@@ -104,6 +104,8 @@ PATCHES=(
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_chat-ids/chat_ids.patch"
 	"${FILESDIR}/patches/0/0000_disable_saving_restrictions.patch"
 	"${FILESDIR}/patches/0/enable-all-chats-reordering.patch"
+	"${FILESDIR}/patches/0/disable-folder-badge.patch"
+	"${FILESDIR}/patches/0/disable-archive-badge.patch"
 )
 
 pkg_pretend() {
