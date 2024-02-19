@@ -1,6 +1,8 @@
 # Copyright 2020-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# TODO: sandox
+
 EAPI=8
 
 PYTHON_COMPAT=( python3_{10..12} )
@@ -21,20 +23,6 @@ IUSE="dbus enchant +fonts screencast qt6 qt6-imageformats wayland webkit +X"
 REQUIRED_USE="
 	qt6-imageformats? ( qt6 )
 "
-
-MYPATCHES=(
-	"hide-banned"
-	"hide-sponsored-messages"
-	"wide-baloons"
-	"chat-ids"
-	"increase-limits"
-	"ignore-restrictions"
-	"disable_saving_restrictions"
-)
-USE_EXPAND_VALUES_TDESKTOP_PATCHES="${MYPATCHES[@]}"
-for p in ${MYPATCHES[@]}; do
-	IUSE="${IUSE} tdesktop_patches_${p}"
-done
 
 KIMAGEFORMATS_RDEPEND="
 	media-libs/libavif:=
@@ -114,24 +102,12 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}/tdesktop-4.10.0-system-cppgir.patch"
 	"${FILESDIR}/tdesktop-4.10.5-qt_compare.patch"
+	"${FILESDIR}/patches/0/conditional/tdesktop_patches_hide-sponsored-messages/0000-data_data_sponsored_messages.cpp.patch"
+	"${FILESDIR}/patches/0/conditional/tdesktop_patches_chat-ids/chat_ids.patch"
+	"${FILESDIR}/patches/0/0000_disable_saving_restrictions.patch"
 )
 
 pkg_pretend() {
-	for p in ${MYPATCHES[@]}; do
-		if use "tdesktop_patches_${p}"; then
-			tdesktop_patches_warn=1
-		fi
-	done
-	if [[ -n "${tdesktop_patches_warn}" ]]; then
-		ewarn "!!!!!!!!!!!!!!!!!!!!!!!!!"
-		ewarn "!!!!!!!! WARNNING !!!!!!!"
-		ewarn "!!!!!!!!!!!!!!!!!!!!!!!!!"
-		ewarn "You have enabled some custom patches!"
-		ewarn "Some of them can violate TOS of Telegram and can (but non necessary will) lead to ban of your account on TG main network."
-		ewarn "Please, be careful."
-		einfo "Also, note that none of that patches have any chance to be ported to ${PN} ebuild in Gentoo repo"
-	fi
-
 	if has ccache ${FEATURES}; then
 		ewarn "ccache does not work with ${PN} out of the box"
 		ewarn "due to usage of precompiled headers"
@@ -189,6 +165,7 @@ src_configure() {
 	# the same state across both projects.
 	# See https://bugs.gentoo.org/866055
 	append-cppflags '-DNDEBUG'
+	replace-flags "-O2" "-O3"
 
 	local qt=$(usex qt6 6 5)
 	local mycmakeargs=(
