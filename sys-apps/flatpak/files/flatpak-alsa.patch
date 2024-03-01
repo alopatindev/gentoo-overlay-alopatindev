@@ -1,31 +1,34 @@
-diff -u a/common/flatpak-context.c b/common/flatpak-context.c
---- a/common/flatpak-context.c	2018-11-16 13:31:49.000000000 +0300
-+++ b/common/flatpak-context.c	2018-12-05 13:49:13.888321314 +0300
-@@ -67,6 +67,7 @@
-   "dri",
+diff --git a/common/flatpak-context-private.h b/common/flatpak-context-private.h
+index d9a7977..d83316d 100644
+--- a/common/flatpak-context-private.h
++++ b/common/flatpak-context-private.h
+@@ -57,6 +57,7 @@ typedef enum {
+   FLATPAK_CONTEXT_DEVICE_ALL         = 1 << 1,
+   FLATPAK_CONTEXT_DEVICE_KVM         = 1 << 2,
+   FLATPAK_CONTEXT_DEVICE_SHM         = 1 << 3,
++  FLATPAK_CONTEXT_DEVICE_ALSA        = 1 << 4,
+ } FlatpakContextDevices;
+ 
+ typedef enum {
+diff --git a/common/flatpak-context.c b/common/flatpak-context.c
+index 3865380..8acb50e 100644
+--- a/common/flatpak-context.c
++++ b/common/flatpak-context.c
+@@ -70,6 +70,7 @@ const char *flatpak_context_devices[] = {
    "all",
    "kvm",
+   "shm",
 +  "alsa",
    NULL
  };
  
-diff -u a/common/flatpak-context-private.h b/common/flatpak-context-private.h
---- a/common/flatpak-context-private.h	2018-11-16 13:31:49.000000000 +0300
-+++ b/common/flatpak-context-private.h	2018-12-05 13:48:53.672322433 +0300
-@@ -47,6 +47,7 @@
-   FLATPAK_CONTEXT_DEVICE_DRI         = 1 << 0,
-   FLATPAK_CONTEXT_DEVICE_ALL         = 1 << 1,
-   FLATPAK_CONTEXT_DEVICE_KVM         = 1 << 2,
-+  FLATPAK_CONTEXT_DEVICE_ALSA        = 1 << 3,
- } FlatpakContextDevices;
- 
- typedef enum {
-diff -u a/common/flatpak-run.c b/common/flatpak-run.c
---- a/common/flatpak-run.c	2018-11-16 13:39:15.000000000 +0300
-+++ b/common/flatpak-run.c	2018-12-05 14:14:31.971237345 +0300
-@@ -1088,6 +1088,13 @@
-           if (g_file_test ("/dev/kvm", G_FILE_TEST_EXISTS))
-             flatpak_bwrap_add_args (bwrap, "--dev-bind", "/dev/kvm", "/dev/kvm", NULL);
+diff --git a/common/flatpak-run.c b/common/flatpak-run.c
+index 8fa8c0e..d3c5943 100644
+--- a/common/flatpak-run.c
++++ b/common/flatpak-run.c
+@@ -1751,6 +1751,13 @@ flatpak_run_add_environment_args (FlatpakBwrap    *bwrap,
+                                   "--bind", shared_dev_shm, "/dev/shm",
+                                   NULL);
          }
 +
 +      if (context->devices & FLATPAK_CONTEXT_DEVICE_ALSA)
@@ -36,4 +39,4 @@ diff -u a/common/flatpak-run.c b/common/flatpak-run.c
 +        }
      }
  
-   flatpak_context_append_bwrap_filesystem (context, bwrap, app_id, app_id_dir, &exports);
+   exports = flatpak_context_get_exports_full (context,
