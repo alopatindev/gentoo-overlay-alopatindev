@@ -54,7 +54,7 @@ BDEPEND="
 	dev-util/glib-utils
 "
 
-GST_PLUGINS_ENABLED="debugutils transcode"
+GST_PLUGINS_ENABLED="debugutils transcode x265 libde265 voaacenc videofilters webp speed nvcodec gl coloreffects aiff colormanagement openjpeg jpegformat"
 
 DOCS=( AUTHORS ChangeLog NEWS README.md RELEASE )
 
@@ -78,6 +78,7 @@ multilib_src_configure() {
 		-Dshm=enabled
 		-Dipcpipeline=enabled
 		-Dhls=disabled
+		-Dgpl=enabled
 		$(meson_feature vnc librfb)
 		$(meson_feature wayland)
 	)
