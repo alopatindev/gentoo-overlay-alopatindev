@@ -1,0 +1,17 @@
+diff -ur kdenlive-23.08.5.orig/src/timeline2/view/qml/timeline.qml kdenlive-23.08.5/src/timeline2/view/qml/timeline.qml
+--- kdenlive-23.08.5.orig/src/timeline2/view/qml/timeline.qml	2024-02-13 12:00:18.000000000 +0800
++++ kdenlive-23.08.5/src/timeline2/view/qml/timeline.qml	2024-03-05 10:28:04.784907159 +0800
+@@ -196,10 +196,10 @@
+ 
+     function horizontalScroll(wheel) {
+         var initialX = scrollView.contentX
+-        if (wheel.angleDelta.y < 0) {
+-            scrollView.contentX = Math.max(0, Math.min(scrollView.contentX - wheel.angleDelta.y, timeline.fullDuration * root.timeScale - scrollView.width))
++        if (wheel.angleDelta.x < 0) {
++            scrollView.contentX = Math.max(0, Math.min(scrollView.contentX - wheel.angleDelta.x, timeline.fullDuration * root.timeScale - scrollView.width))
+         } else {
+-            scrollView.contentX = Math.max(scrollView.contentX - wheel.angleDelta.y, 0)
++            scrollView.contentX = Math.max(scrollView.contentX - wheel.angleDelta.x, 0)
+         }
+         if (dragProxyArea.pressed && dragProxy.draggedItem > -1) {
+             dragProxy.x += scrollView.contentX - initialX
