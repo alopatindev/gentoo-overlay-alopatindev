@@ -1,0 +1,13 @@
+diff --git a/src/timeline2/view/qml/timeline.qml b/src/timeline2/view/qml/timeline.qml
+index 12d7295da..421fe782c 100644
+--- a/src/timeline2/view/qml/timeline.qml
++++ b/src/timeline2/view/qml/timeline.qml
+@@ -1324,7 +1324,7 @@ Rectangle {
+                     zoomByWheel(wheel)
+                 } else if (root.activeTool !== ProjectTool.SlipTool) {
+                     var delta = wheel.modifiers & Qt.ShiftModifier ? timeline.fps() : 1
+-                    proxy.position = wheel.angleDelta.y > 0 ? Math.max(root.consumerPosition - delta, 0) : Math.min(root.consumerPosition + delta, timeline.fullDuration - 1)
++                    //proxy.position = wheel.angleDelta.y > 0 ? Math.max(root.consumerPosition - delta, 0) : Math.min(root.consumerPosition + delta, timeline.fullDuration - 1)
+                 }
+             }
+             onPressed: mouse => {

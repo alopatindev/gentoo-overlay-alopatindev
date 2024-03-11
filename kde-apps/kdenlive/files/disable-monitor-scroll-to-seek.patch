@@ -1,0 +1,20 @@
+diff --git a/src/monitor/monitor.cpp b/src/monitor/monitor.cpp
+index 909494fc4..7c03a339f 100644
+--- a/src/monitor/monitor.cpp
++++ b/src/monitor/monitor.cpp
+@@ -1142,6 +1142,7 @@ void Monitor::slotMouseSeek(int eventDelta, uint modifiers)
+         m_glMonitor->slotZoom(eventDelta > 0);
+         return;
+     } else if ((modifiers & Qt::ShiftModifier) != 0u) {
++        return;
+         // Shift wheel seeks one second
+         int delta = qRound(pCore->getCurrentFps());
+         if (eventDelta > 0) {
+@@ -1156,6 +1157,7 @@ void Monitor::slotMouseSeek(int eventDelta, uint modifiers)
+             Q_EMIT seekToNextSnap();
+         }
+     } else {
++        return;
+         if (eventDelta >= 0) {
+             slotRewindOneFrame();
+         } else {

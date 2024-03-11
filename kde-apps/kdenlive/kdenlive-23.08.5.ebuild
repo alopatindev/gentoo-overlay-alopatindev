@@ -70,7 +70,11 @@ RDEPEND="${DEPEND}
 BDEPEND="sys-devel/gettext"
 
 PATCHES=(
+	#"${FILESDIR}"/allow-gpu.patch
 	"${FILESDIR}"/horizontal-scroll.patch
+	"${FILESDIR}"/disable-timeline-seek-by-scrolling.patch
+	"${FILESDIR}"/disable-monitor-scroll-to-seek.patch
+	"${FILESDIR}"/fix-monitor-zoom.patch
 )
 
 src_configure() {

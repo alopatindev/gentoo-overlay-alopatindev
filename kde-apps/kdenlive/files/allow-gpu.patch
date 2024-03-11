@@ -1,0 +1,17 @@
+diff --git a/src/mainwindow.cpp b/src/mainwindow.cpp
+index e959f2e3a..acf5c0e0d 100644
+--- a/src/mainwindow.cpp
++++ b/src/mainwindow.cpp
+@@ -233,11 +233,7 @@ void MainWindow::init(const QString &mltPath)
+         KdenliveSettings::setDefault_profile(QStringLiteral("atsc_1080p_25"));
+     }
+ 
+-    // Disable movit until it's stable
+-    m_gpuAllowed = false;
+-    KdenliveSettings::setGpu_accel(false);
+-
+-    // m_gpuAllowed = EffectsRepository::get()->hasInternalEffect(QStringLiteral("glsl.manager"));
++    m_gpuAllowed = EffectsRepository::get()->hasInternalEffect(QStringLiteral("glsl.manager"));
+ 
+     m_shortcutRemoveFocus = new QShortcut(QKeySequence(QStringLiteral("Esc")), this);
+     connect(m_shortcutRemoveFocus, &QShortcut::activated, this, &MainWindow::slotRemoveFocus);
