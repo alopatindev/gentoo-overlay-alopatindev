@@ -16,7 +16,7 @@ S="${WORKDIR}/${MY_P}"
 
 LICENSE="BSD GPL-3-with-openssl-exception LGPL-2+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~loong ~ppc64 ~riscv"
+KEYWORDS="~amd64 ~arm64 ~riscv"
 IUSE="dbus enchant +fonts +jemalloc +libdispatch screencast qt6 qt6-imageformats wayland webkit +X"
 REQUIRED_USE="
 	qt6-imageformats? ( qt6 )
@@ -31,23 +31,24 @@ CDEPEND="
 	!net-im/telegram-desktop-bin
 	app-arch/lz4:=
 	dev-cpp/abseil-cpp:=
+	dev-cpp/ada:=
 	>=dev-cpp/glibmm-2.77:2.68
 	dev-libs/glib:2
-	libdispatch? ( dev-libs/libdispatch )
 	dev-libs/openssl:=
 	dev-libs/protobuf
 	dev-libs/xxhash
 	media-libs/libjpeg-turbo:=
-	~media-libs/libtgvoip-2.4.4_p20221208
+	~media-libs/libtgvoip-2.4.4_p20240706
 	media-libs/openal
 	media-libs/opus
 	media-libs/rnnoise
-	~media-libs/tg_owt-0_pre20230921:=[screencast=,X=]
+	~media-libs/tg_owt-0_pre20240804:=[screencast=,X=]
 	media-video/ffmpeg:=[opus,vpx]
 	sys-libs/zlib:=[minizip]
 	!enchant? ( >=app-text/hunspell-1.7:= )
 	enchant? ( app-text/enchant:= )
 	jemalloc? ( dev-libs/jemalloc:= )
+	libdispatch? ( dev-libs/libdispatch )
 	!qt6? (
 		>=dev-qt/qtcore-5.15:5=
 		>=dev-qt/qtgui-5.15:5=[dbus?,jpeg,png,wayland?,X?]
@@ -84,7 +85,7 @@ RDEPEND="${CDEPEND}
 "
 DEPEND="${CDEPEND}
 	>=dev-cpp/cppgir-2.0_p20240315
-	>=dev-cpp/ms-gsl-4
+	>=dev-cpp/ms-gsl-4.1.0
 	dev-cpp/expected-lite
 	dev-cpp/range-v3
 "
@@ -97,16 +98,19 @@ BDEPEND="
 	wayland? ( dev-util/wayland-scanner )
 "
 
+# https://github.com/msva/mva-overlay/tree/master/net-im/telegram-desktop/files/patches/0/conditional
+# https://github.com/rdnvndr/aurpkg/tree/master/telegram-desktop-patches-master
 PATCHES=(
 	"${FILESDIR}"/tdesktop-4.2.4-jemalloc-only-telegram-r1.patch
 	"${FILESDIR}"/tdesktop-4.10.0-system-cppgir.patch
 	"${FILESDIR}"/tdesktop-5.2.2-qt6-no-wayland.patch
 	"${FILESDIR}"/tdesktop-5.2.2-libdispatch.patch
+	"${FILESDIR}"/tdesktop-5.7.2-cstring.patch
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_hide-sponsored-messages/0000-data_data_sponsored_messages.cpp.patch"
-	"${FILESDIR}/patches/0/conditional/tdesktop_patches_chat-ids/chat_ids.patch"
+	#"${FILESDIR}/patches/0/conditional/tdesktop_patches_chat-ids/chat_ids.patch"
 	"${FILESDIR}/patches/0/0000_disable_saving_restrictions.patch"
 	"${FILESDIR}/patches/0/enable-all-chats-reordering.patch"
-	"${FILESDIR}/patches/0/disable-folder-badge.patch"
+	#"${FILESDIR}/patches/0/disable-folder-badge.patch"
 	"${FILESDIR}/patches/0/disable-archive-badge.patch"
 )
 
