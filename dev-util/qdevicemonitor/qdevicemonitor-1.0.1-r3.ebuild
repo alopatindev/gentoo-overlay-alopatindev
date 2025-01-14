@@ -22,9 +22,7 @@ IUSE=""
 
 RDEPEND="
 	app-pda/usbmuxd
-	dev-qt/qtcore:5
-	dev-qt/qtgui:5
-	dev-qt/qtwidgets:5
+	dev-qt/qtbase:6[gui,widgets]
 	dev-util/android-tools"
 DEPEND="${RDEPEND}"
 
@@ -35,12 +33,13 @@ PATCHES=(
 	"${FILESDIR}"/${P}-endl-is-deprecated.patch
 	"${FILESDIR}"/${P}-disable-warnings-as-errors.patch
 	"${FILESDIR}"/${P}-disable-pedantic-errors.patch
+	"${FILESDIR}"/${P}-qt-6.patch
 )
 
 src_configure() {
 	cd "${PN}" || die
 	export VERSION_WITH_BUILD_NUMBER="${PV}"
-	eqmake5
+	eqmake6
 }
 
 src_compile() {
