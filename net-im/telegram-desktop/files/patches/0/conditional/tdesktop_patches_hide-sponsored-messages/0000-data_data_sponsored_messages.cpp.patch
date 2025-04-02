@@ -1,16 +1,61 @@
-*** a/Telegram/SourceFiles/data/components/sponsored_messages.cpp	2024-11-05 11:45:43.000000000 +0300
---- b/Telegram/SourceFiles/data/components/sponsored_messages.cpp	2024-11-12 15:36:57.080621183 +0300
-***************
-*** 195,205 ****
-  }
-  
-  bool SponsoredMessages::canHaveFor(not_null<History*> history) const {
-- 	if (history->peer->isChannel()) {
-- 		return true;
-- 	} else if (const auto user = history->peer->asUser()) {
-- 		return user->isBot();
-- 	}
-  	return false;
-  }
-  
---- 195,200 ----
+diff --git i/Telegram/SourceFiles/data/data_sponsored_messages.cpp w/Telegram/SourceFiles/data/data_sponsored_messages.cpp
+index 10e69d37b..fbcb20158 100644
+--- i/Telegram/SourceFiles/data/components/sponsored_messages.cpp
++++ w/Telegram/SourceFiles/data/components/sponsored_messages.cpp
+@@ -21,7 +21,7 @@ https://github.com/telegramdesktop/tdesk
+ namespace Data {
+ namespace {
+ 
+-constexpr auto kRequestTimeLimit = 5 * 60 * crl::time(1000);
++constexpr auto kRequestTimeLimit = 9999999 * 60 * crl::time(1000);
+ 
+ [[nodiscard]] bool TooEarlyForRequest(crl::time received) {
+ 	return (received > 0) && (received + kRequestTimeLimit > crl::now());
+@@ -74,6 +74,9 @@ void SponsoredMessages::clearOldRequests
+ 
+ SponsoredMessages::AppendResult SponsoredMessages::append(
+ 		not_null<History*> history) {
++	if (1) {
++		return SponsoredMessages::AppendResult::None;
++	}
+ 	if (isTopBarFor(history)) {
+ 		return SponsoredMessages::AppendResult::None;
+ 	}
+@@ -110,6 +113,9 @@ void SponsoredMessages::inject(
+ 		MsgId injectAfterMsgId,
+ 		int betweenHeight,
+ 		int fallbackWidth) {
++	if (1) {
++		return;
++	}
+ 	if (!canHaveFor(history)) {
+ 		return;
+ 	}
+@@ -198,24 +204,17 @@ void SponsoredMessages::inject(
+ }
+ 
+ bool SponsoredMessages::canHaveFor(not_null<History*> history) const {
+-	if (history->peer->isChannel()) {
+-		return true;
+-	} else if (const auto user = history->peer->asUser()) {
+-		return user->isBot();
+-	}
+ 	return false;
+ }
+ 
+ bool SponsoredMessages::isTopBarFor(not_null<History*> history) const {
+-	if (peerIsUser(history->peer->id)) {
+-		if (const auto user = history->peer->asUser()) {
+-			return user->isBot();
+-		}
+-	}
+ 	return false;
+ }
+ 
+ void SponsoredMessages::request(not_null<History*> history, Fn<void()> done) {
++	if (1) {
++		return;
++	}
+ 	if (!canHaveFor(history)) {
+ 		return;
+ 	}
