@@ -83,6 +83,7 @@ PATCHES=(
 	"${FILESDIR}"/tdesktop-5.7.2-cstring.patch
 	"${FILESDIR}"/tdesktop-5.8.3-cstdint.patch
 	"${FILESDIR}"/tdesktop-5.12.3-fix-webview.patch
+	"${FILESDIR}"/tdesktop-5.12.3-qt-namechange.patch
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_hide-sponsored-messages/0000-data_data_sponsored_messages.cpp.patch"
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_chat-ids/chat_ids.patch"
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_hide-banned/0000_hide-messages-from-blocked-users.patch"
