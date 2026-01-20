@@ -54,7 +54,7 @@ COMMON_DEPEND="
 		)
 	)
 	cuda? (
-		dev-util/nvidia-cuda-toolkit:=
+		<dev-util/nvidia-cuda-toolkit-12.9
 	)
 	rocm? (
 		>=dev-util/hip-${ROCM_VERSION}:=
