@@ -90,12 +90,12 @@ PATCHES=(
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_chat-ids/chat_ids.patch"
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_hide-banned/0000_hide-messages-from-blocked-users.patch"
 	#"${FILESDIR}/patches/0/0000_disable_saving_restrictions.patch"
-	#"${FILESDIR}/patches/0/conditional/tdesktop_patches_ignore-restrictions/saving-restrictions.patch" # FIXME
+	"${FILESDIR}/patches/0/conditional/tdesktop_patches_ignore-restrictions/saving-restrictions.patch"
 	"${FILESDIR}/patches/0/enable-all-chats-reordering.patch"
 	"${FILESDIR}/patches/0/disable-folder-badge.patch"
 	"${FILESDIR}/patches/0/disable-archive-badge.patch"
 	#"${FILESDIR}/patches/0/0005-Option-to-disable-stories.patch"
-	#"${FILESDIR}/patches/0/conditional/tdesktop_patches_allow-disable-stories/option-to-disable-stories.patch" # FIXME
+	"${FILESDIR}/patches/0/conditional/tdesktop_patches_allow-disable-stories/option-to-disable-stories.patch"
 	#"${FILESDIR}/patches/0/conditional/tdesktop_patches_wide-baloons/0000_exploit_through_monospace.patch.d"
 	#"${FILESDIR}/patches/0/conditional/tdesktop_patches_wide-baloons/wide_balloons_kotato2.patch"
 	"${FILESDIR}/patches/0/conditional/tdesktop_patches_wide-baloons/style.patch"
