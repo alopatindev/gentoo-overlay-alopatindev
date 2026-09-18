@@ -1,45 +1,35 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-inherit desktop qmake-utils
+inherit desktop git-r3 qmake-utils xdg
 
 DESCRIPTION="Crossplatform log viewer for Android, iOS and text files"
 HOMEPAGE="https://github.com/alopatindev/qdevicemonitor"
-
-if [[ ${PV} == *9999* ]] ; then
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/alopatindev/${PN}"
-else
-	SRC_URI="https://github.com/alopatindev/qdevicemonitor/archive/${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~x86"
-fi
+EGIT_REPO_URI="https://github.com/alopatindev/${PN}"
 
 LICENSE="GPL-3"
 SLOT="0"
-IUSE=""
+KEYWORDS="~amd64 ~x86"
 
-RDEPEND="
-	app-pda/usbmuxd
+DEPEND="
 	dev-qt/qtbase:6[gui,widgets]
+	virtual/libudev:="
+RDEPEND="${DEPEND}
+	app-pda/usbmuxd
 	dev-util/android-tools"
-DEPEND="${RDEPEND}"
+
+DOCS=( ../README.md )
 
 src_configure() {
-	cd "${PN}" || die
-	export VERSION_WITH_BUILD_NUMBER="${PV}"
+	export VERSION_WITH_BUILD_NUMBER="${PV}-${COMMIT:0:8}"
 	eqmake6
 }
 
-src_compile() {
-	cd "${PN}" || die
-	emake
-}
-
 src_install() {
-	dobin "${PN}/${PN}"
-	dodoc README.md
-	newicon -s scalable "icons/app_icon.svg" "${PN}.svg"
-	domenu "icons/${PN}.desktop"
+	dobin "${PN}"
+	einstalldocs
+	newicon -s scalable "../icons/app_icon.svg" "${PN}.svg"
+	domenu "../icons/${PN}.desktop"
 }
