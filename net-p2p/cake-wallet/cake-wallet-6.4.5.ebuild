@@ -102,6 +102,8 @@ src_compile() {
 	export CARGO_HOME="${T}/cargo"
 	export GOPATH="${T}/go"
 
+	addwrite /opt/flutter
+
 	# Generate the native cryptocurrency dependencies used by Cake Wallet.
 	#if [[ -x scripts/gen_android_manifest.sh ]]; then
 	#	./scripts/gen_android_manifest.sh || die
@@ -119,13 +121,13 @@ src_compile() {
 		./scripts/prepare_zcash.sh || die
 	fi
 
-	if [[ -x scripts/prepare_reown.sh ]]; then
-		./scripts/prepare_reown.sh || die
-	fi
+	#if [[ -x scripts/prepare_reown.sh ]]; then
+	#	./scripts/prepare_reown.sh || die
+	#fi
 
-	if [[ -x scripts/build_bitbox_flutter.sh ]]; then
-		./scripts/build_bitbox_flutter.sh || die
-	fi
+	#if [[ -x scripts/build_bitbox_flutter.sh ]]; then
+	#	./scripts/build_bitbox_flutter.sh || die
+	#fi
 
 	if [[ -x scripts/linux/build_monero_all.sh ]]; then
 		pushd scripts/linux >/dev/null || die

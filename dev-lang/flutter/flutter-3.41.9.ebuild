@@ -111,11 +111,11 @@ src_install() {
 	# the 'flutter' group rather than to a single account or to everyone.
 	# Ordering matters: this runs before the dart-sdk symlink is created, so
 	# neither chown nor chmod can reach /usr/lib/dart through it.
-	fowners -R root:flutter "/opt/${PN}"
-	fperms -R g+w "/opt/${PN}"
+	#fowners -R root:flutter "/opt/${PN}"
+	#fperms -R g+w "/opt/${PN}"
 	# setgid on directories, so files created by one group member stay
 	# group-owned by 'flutter' and remain writable for the others.
-	find "${ED}/opt/${PN}" -type d -exec chmod g+s {} + || die
+	#find "${ED}/opt/${PN}" -type d -exec chmod g+s {} + || die
 
 	# Absolute symlink into the system Dart SDK installed by dev-lang/dart.
 	dosym /usr/lib/dart "/opt/${PN}/bin/cache/dart-sdk"
