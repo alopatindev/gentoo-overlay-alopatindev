@@ -35,17 +35,23 @@ src_prepare() {
 	# Keep Flutter/Dart caches inside the Portage build directory.
 	export PUB_CACHE="${T}/pub-cache"
 
-	flutter config --enable-linux-desktop || die
+	git config --global --add safe.directory /opt/flutter
+
+	addwrite /opt/flutter
+
+	flutter config --enable-linux-desktop --no-analytics || die
 }
 
 src_compile() {
+	cd "${S}" || die
+
 	# This is intentionally done after git-r3 has checked out EGIT_COMMIT.
-	flutter pub get || die
+	#flutter pub get || die
 
 	# Generate project files when provided by this release.
-	if [[ -f tool/generate_localization.dart ]]; then
-		dart run tool/generate_localization.dart || die
-	fi
+	#if [[ -f tool/generate_localization.dart ]]; then
+	#	dart --disable-analytics run tool/generate_localization.dart || die
+	#fi
 
 	flutter build linux --release || die
 }
