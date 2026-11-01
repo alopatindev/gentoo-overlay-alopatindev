@@ -1,0 +1,22 @@
+--- a/src/tests/maintests.c
++++ b/src/tests/maintests.c
+@@ -229,7 +229,7 @@ gint main (gint argc, gchar *argv[])
+   ut_config.debug   = g_test_verbose();
+   ut_config.quiet   = g_test_quiet() || !g_test_verbose();
+   
+-  setup_log_handler ();
++  //setup_log_handler ();
+   
+   // hook up the test functions
+   g_test_add_func ("/Utils/Suffix/Test1", test_suffix1);
+--- a/src/utimer.c
++++ b/src/utimer.c
+@@ -161,7 +161,7 @@ int main (int argc, char *argv[])
+   tcgetattr(STDIN_FILENO, &savedttystate); /* Save current tty state  */
+   
+   g_thread_init (NULL);
+-  g_type_init ();
++  //g_type_init ();
+   init_config (&ut_config);
+   
+   /* We cleanup at exit */

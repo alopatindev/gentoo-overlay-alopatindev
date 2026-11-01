@@ -20,6 +20,7 @@ DEPEND="${RDEPEND}"
 PATCHES=(
 	"${FILESDIR}"/${P}-fno-common.patch
 	"${FILESDIR}"/${P}-locale.patch
+	"${FILESDIR}"/${P}-test.patch
 )
 DOCS=( AUTHORS ChangeLog NEWS README )
 
