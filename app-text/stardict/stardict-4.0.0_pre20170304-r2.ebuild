@@ -32,7 +32,7 @@ RESTRICT="test"
 COMMON_DEPEND="
 	>=dev-libs/glib-2.32:2
 	dev-libs/libsigc++:2=
-	media-libs/libcanberra[gtk3]
+	media-libs/libcanberra-gtk3
 	sys-libs/zlib:=
 	x11-libs/gdk-pixbuf:2
 	x11-libs/gtk+:3
@@ -40,7 +40,7 @@ COMMON_DEPEND="
 	x11-libs/pango
 	espeak? ( >=app-accessibility/espeak-ng-1.29 )
 	flite? ( app-accessibility/flite )
-	gucharmap? ( gnome-extra/gucharmap:2.90= )
+	gucharmap? ( gnome-extra/gucharmap )
 	spell? ( >=app-text/enchant-1.2:0 )
 	tools? (
 		dev-db/mysql-connector-c

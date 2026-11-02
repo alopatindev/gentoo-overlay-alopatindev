@@ -34,7 +34,7 @@ COMMON_DEPEND="
 	>=x11-libs/gtk+-2.20:2
 	x11-libs/libX11
 	x11-libs/pango
-	gucharmap? ( gnome-extra/gucharmap:0= )
+	gucharmap? ( gnome-extra/gucharmap )
 	spell? ( >=app-text/enchant-1.2:0 )
 	tools? (
 		dev-db/mysql-connector-c
